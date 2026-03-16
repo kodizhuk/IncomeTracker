@@ -2,6 +2,8 @@ import 'package:path_provider/path_provider.dart';
 
 import '../models/transaction.dart' as model;
 import '../models/savings_account.dart';
+import 'package:file_selector/file_selector.dart';
+
 
 import 'dart:async';
 import 'dart:io';
@@ -417,7 +419,18 @@ class DatabaseService {
     await file.writeAsString(csvString);
 
     // 9) Share the file (user can save to Downloads)
-    if (!Platform.isLinux) {
+    if (Platform.isWindows) {
+      final FileSaveLocation? location = await getSaveLocation(
+        suggestedName: 'export.csv',
+        acceptedTypeGroups: [
+          XTypeGroup(label: 'CSV', extensions: ['csv']),
+        ],
+      );
+      if (location != null) {
+        final String path = location.path;
+        // save file to path
+      }
+    }else if(Platform.isAndroid){
       final XFile csvFile = XFile(
         filePath,
         name: 'all_data_export_$timestamp.csv',
@@ -425,8 +438,6 @@ class DatabaseService {
       await Share.shareXFiles([
         csvFile,
       ], text: 'Your income, expenses, and savings CSV export');
-    } else {
-      // Linux fallback: print path
     }
 
     return filePath;

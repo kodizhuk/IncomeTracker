@@ -91,50 +91,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row(
-                //   children: [
-                //     const Expanded(child: Text('USD rate')),
-                //     const SizedBox(width: 12),
-                //     SizedBox(
-                //       width: 120,
-                //       child: TextFormField(
-                //         controller: _usdController,
-                //         decoration: const InputDecoration(hintText: '42', contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 8)),
-                //         textAlign: TextAlign.right,
-                //         keyboardType: TextInputType.numberWithOptions(decimal: true),
-                //         validator: (v) {
-                //           if (v == null || v.isEmpty) return 'Enter USD rate';
-                //           if (double.tryParse(v) == null) return 'Enter a valid number';
-                //           return null;
-                //         },
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // const SizedBox(height: 12),
-                // Row(
-                //   children: [
-                //     const Expanded(child: Text('EUR rate')),
-                //     const SizedBox(width: 12),
-                //     SizedBox(
-                //       width: 120,
-                //       child: TextFormField(
-                //         controller: _eurController,
-                //         decoration: const InputDecoration(hintText: '51', contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 8)),
-                //         textAlign: TextAlign.right,
-                //         keyboardType: TextInputType.numberWithOptions(decimal: true),
-                //         validator: (v) {
-                //           if (v == null || v.isEmpty) return 'Enter EUR rate';
-                //           if (double.tryParse(v) == null) return 'Enter a valid number';
-                //           return null;
-                //         },
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // const SizedBox(height: 24),
-                // ElevatedButton(onPressed: _saveRates, child: const Text('Save')),
-                // const Divider(height: 32),
                 ListTile(
                   leading: const Icon(Icons.language),
                   title: const Text('Language'),
