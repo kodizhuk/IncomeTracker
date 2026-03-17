@@ -372,7 +372,7 @@ class DatabaseService {
           (row) => [
             row[TransactionsFields.type] ?? '',
             row[TransactionsFields.id] ?? '',
-            row[TransactionsFields.date] ?? '',
+            (row[TransactionsFields.date] as String? ?? '').split('T')[0],
             row[TransactionsFields.name] ?? '',
             row[TransactionsFields.amount] ?? '',
             row[TransactionsFields.amountUsd] ?? '',
@@ -389,7 +389,7 @@ class DatabaseService {
           (row) => [
             'savings',
             row[SavingsAccountsFields.id] ?? '',
-            row[SavingsAccountsFields.lastUpdated] ?? '',
+            (row[SavingsAccountsFields.lastUpdated] as String? ?? '').split('T')[0],
             row[SavingsAccountsFields.name] ?? '',
             row[SavingsAccountsFields.amount] ?? '',
             row[SavingsAccountsFields.amountUsd] ?? '',
@@ -410,30 +410,33 @@ class DatabaseService {
     // 7) Convert to CSV string
     final csvString = const ListToCsvConverter().convert(data);
 
-    // 8) Save to app documents directory
-    final directory = await getApplicationDocumentsDirectory();
+    // 8) Save to app documents directory or share (depending on platform)
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final filePath = '${directory.path}/all_data_export_$timestamp.csv';
+    final dt = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    // format date as YYYY-MM-DD_HH-MM-SS
+    String formattedDate = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}_${dt.hour.toString().padLeft(2, '0')}-${dt.minute.toString().padLeft(2, '0')}-${dt.second.toString().padLeft(2, '0')}';
+    String filePath = '';
 
-    final file = File(filePath);
-    await file.writeAsString(csvString);
-
-    // 9) Share the file (user can save to Downloads)
     if (Platform.isWindows) {
       final FileSaveLocation? location = await getSaveLocation(
-        suggestedName: 'export.csv',
+        suggestedName: 'all_data_export_$formattedDate.csv',
         acceptedTypeGroups: [
           XTypeGroup(label: 'CSV', extensions: ['csv']),
         ],
       );
       if (location != null) {
-        final String path = location.path;
-        // save file to path
+        filePath = location.path;
+        final file = File(filePath);
+        await file.writeAsString(csvString);
+      }else{
+        throw Exception('File save location not selected');
       }
     }else if(Platform.isAndroid){
+      final directory = await getApplicationDocumentsDirectory();
+      filePath = '${directory.path}/all_data_export_$formattedDate.csv';
       final XFile csvFile = XFile(
         filePath,
-        name: 'all_data_export_$timestamp.csv',
+        name: 'all_data_export_$formattedDate.csv',
       );
       await Share.shareXFiles([
         csvFile,
