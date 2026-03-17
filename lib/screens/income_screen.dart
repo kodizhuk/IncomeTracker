@@ -202,21 +202,20 @@ class _IncomeScreenState extends State<IncomeScreen> {
 
   String _calculateTithe() {
     // Convert all income to UAH
-    double totalIncomeUAH = _allIncomeTransactions.fold(0.0, (sum, tx) {
-      // TODO: calculates only in UAH, need to add currency conversion for USD and EUR
-      if (tx.currency == 'UAH') {
-        return sum + tx.amount;
-      }
 
+    double totalIncomeUAH = _allIncomeTransactions.fold(0.0, (sum, tx) {
+      if (tx.currency == 'UAH') {
+        return sum = sum + tx.amount;
+      }
       return sum;
     });
 
     // Sum expenses whose source/category equals 'Tithes' (case-insensitive), in UAH
     double titheExpensesUAH = _expenseTransactions.fold(0.0, (sum, tx) {
-      if ((tx.source ?? '').toString().toLowerCase() != 'tithe') return sum;
+      if ((tx.source ?? '').toString().toLowerCase() != 'tithes') return sum;
 
       if (tx.currency == 'UAH') {
-        return sum + tx.amount;
+        return sum = sum + tx.amount;
       }
       return sum;
     });
