@@ -4,7 +4,6 @@ import '../models/transaction.dart' as model;
 import '../models/savings_account.dart';
 import 'package:file_selector/file_selector.dart';
 
-
 import 'dart:async';
 import 'dart:io';
 import 'package:path/path.dart' as p;
@@ -389,7 +388,9 @@ class DatabaseService {
           (row) => [
             'savings',
             row[SavingsAccountsFields.id] ?? '',
-            (row[SavingsAccountsFields.lastUpdated] as String? ?? '').split('T')[0],
+            (row[SavingsAccountsFields.lastUpdated] as String? ?? '').split(
+              'T',
+            )[0],
             row[SavingsAccountsFields.name] ?? '',
             row[SavingsAccountsFields.amount] ?? '',
             row[SavingsAccountsFields.amountUsd] ?? '',
@@ -414,10 +415,11 @@ class DatabaseService {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final dt = DateTime.fromMillisecondsSinceEpoch(timestamp);
     // format date as YYYY-MM-DD_HH-MM-SS
-    String formattedDate = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}_${dt.hour.toString().padLeft(2, '0')}-${dt.minute.toString().padLeft(2, '0')}-${dt.second.toString().padLeft(2, '0')}';
+    String formattedDate =
+        '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}_${dt.hour.toString().padLeft(2, '0')}-${dt.minute.toString().padLeft(2, '0')}-${dt.second.toString().padLeft(2, '0')}';
     String filePath = '';
 
-    if (Platform.isWindows) {
+    if (Platform.isWindows || Platform.isLinux) {
       final FileSaveLocation? location = await getSaveLocation(
         suggestedName: 'all_data_export_$formattedDate.csv',
         acceptedTypeGroups: [
@@ -428,10 +430,10 @@ class DatabaseService {
         filePath = location.path;
         final file = File(filePath);
         await file.writeAsString(csvString);
-      }else{
+      } else {
         throw Exception('File save location not selected');
       }
-    }else if(Platform.isAndroid){
+    } else if (Platform.isAndroid) {
       final directory = await getApplicationDocumentsDirectory();
       filePath = '${directory.path}/all_data_export_$formattedDate.csv';
       final XFile csvFile = XFile(
