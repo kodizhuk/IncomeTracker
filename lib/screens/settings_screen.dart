@@ -5,6 +5,8 @@ import 'dart:io';
 import 'edit_sources_screen.dart';
 import 'edit_categories_screen.dart';
 
+import 'package:forui/forui.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -72,6 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.theme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -89,8 +92,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: .center,
+              crossAxisAlignment: .start,
               children: [
+                const SizedBox(height: 15),
+                FCard.raw(
+                  child: Padding(
+                    padding: const .fromLTRB(16, 12, 16, 16),
+                    child: Row(
+                      mainAxisAlignment: .spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: .start,
+                            children: [
+                              Text(
+                                'Theme',
+                                style: theme.typography.xs.copyWith(
+                                  fontWeight: .w500,
+                                  color: theme.colors.foreground,
+                                  height: 1.5,
+                                ),
+                              ),
+                              Text(
+                                'Switch between light and dark themes',
+                                style: theme.typography.sm.copyWith(
+                                  color: theme.colors.mutedForeground,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        FormField(
+                          initialValue: false,
+                          onSaved: (value) {
+                            // Save values somewhere.
+                          },
+                          validator: (value) => null, // No validation required.
+                          builder: (state) => FSwitch(
+                            value: state.value ?? false,
+                            onChange: (value) => state.didChange(value),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
                 ListTile(
                   leading: const Icon(Icons.language),
                   title: const Text('Language'),
@@ -104,20 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.palette),
-                  title: const Text('Theme'),
-                  subtitle: const Text('Light'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Theme settings coming soon!'),
-                      ),
-                    );
-                  },
-                ),
+
                 const Divider(),
 
                 ListTile(
