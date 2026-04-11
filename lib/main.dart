@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 
-import 'package:flutter/foundation.dart';
 import 'screens/income_screen.dart';
 import 'screens/expenses_screen.dart';
 import 'screens/savings_screen.dart';
@@ -10,63 +11,53 @@ void main() {
   runApp(const Application());
 }
 
-// class Application extends StatelessWidget {
-//   const Application({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final foruiTheme = FThemes.zinc.dark;
-//     return MaterialApp(
-//       theme: foruiTheme.toApproximateMaterialTheme(),
-//       builder: (_, child) => FAnimatedTheme(data: foruiTheme, child: child!),
-//       home: const HomePage(),
-//     );
-//   }
-// }
-
-class Application extends StatefulWidget {
+class Application extends StatelessWidget {
   const Application({super.key});
 
   @override
-  State<Application> createState() => _ApplicationState();
-}
-
-class _ApplicationState extends State<Application> {
-  late FThemeData _currentTheme;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentTheme = FThemes.zinc.dark; // Start with your preferred default
-  }
-
-  void _setTheme(FThemeData newTheme) {
-    setState(() {
-      _currentTheme = newTheme;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final theme = FThemes.blue.dark;
+
     return MaterialApp(
-      theme: _currentTheme.toApproximateMaterialTheme(),
-      builder: (_, child) => FAnimatedTheme(data: _currentTheme, child: child!),
-      home: HomePage(onThemeSelected: _setTheme),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('uk'), // Set to Ukrainian
+      // localizationsDelegates: const [
+      //   FLocalizations.delegate, // Add this line
+      // ],
+      // supportedLocales: const [
+      //   Locale('en'), // English
+      //   Locale('uk'), // Ukranian
+      // ],
+      theme: theme.toApproximateMaterialTheme(),
+      builder: (_, child) => FAnimatedTheme(data: theme, child: child!),
+
+      home: FScaffold(child: AppStates()),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({
-    super.key,
-    required void Function(FThemeData newTheme) onThemeSelected,
-  });
-
+class AppStates extends StatefulWidget {
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<AppStates> createState() => _AppStates();
 }
 
-class _HomePageState extends State<HomePage> {
+class _AppStates extends State<AppStates> {
+  final _contents = [
+    const Column(
+      mainAxisAlignment: .center,
+      children: [Text('Income Placeholder')],
+    ),
+    const Column(
+      mainAxisAlignment: .center,
+      children: [Text('Expenses Placeholder')],
+    ),
+    const Column(
+      mainAxisAlignment: .center,
+      children: [Text('Savings Placeholder')],
+    ),
+  ];
+
   int _selectedIndex = 0;
   final ValueNotifier<int> _selectedIndexNotifier = ValueNotifier<int>(0);
 
@@ -78,25 +69,37 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return FScaffold(
-      child: _screens[_selectedIndex],
-      footer: FBottomNavigationBar(
-        index: _selectedIndex,
-        onChange: (index) => setState(() => _selectedIndex = index),
-        children: [
-          FBottomNavigationBarItem(
-            icon: Icon(Icons.trending_up),
-            label: Text('Income'),
-          ),
-          FBottomNavigationBarItem(
-            icon: Icon(Icons.trending_down),
-            label: Text('Expenses'),
-          ),
-          FBottomNavigationBarItem(
-            icon: Icon(Icons.savings),
-            label: Text('Savings'),
-          ),
-        ],
+    final l10n = AppLocalizations.of(context)!;
+
+    final _headers = [
+      FHeader(title: Text(l10n.income)),
+      FHeader(title: Text(l10n.expenses)),
+      FHeader(title: Text(l10n.savings)),
+    ];
+
+    return SizedBox(
+      height: 500,
+      child: FScaffold(
+        header: _headers[_selectedIndex],
+        footer: FBottomNavigationBar(
+          index: _selectedIndex,
+          onChange: (index) => setState(() => _selectedIndex = index),
+          children: [
+            FBottomNavigationBarItem(
+              icon: Icon(FIcons.trendingUp),
+              label: Text(l10n.income),
+            ),
+            FBottomNavigationBarItem(
+              icon: Icon(FIcons.trendingDown),
+              label: Text(l10n.expenses),
+            ),
+            FBottomNavigationBarItem(
+              icon: Icon(FIcons.wallet),
+              label: Text(l10n.savings),
+            ),
+          ],
+        ),
+        child: _screens[_selectedIndex],
       ),
     );
   }
