@@ -10,22 +10,57 @@ void main() {
   runApp(const Application());
 }
 
-class Application extends StatelessWidget {
+// class Application extends StatelessWidget {
+//   const Application({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final foruiTheme = FThemes.zinc.dark;
+//     return MaterialApp(
+//       theme: foruiTheme.toApproximateMaterialTheme(),
+//       builder: (_, child) => FAnimatedTheme(data: foruiTheme, child: child!),
+//       home: const HomePage(),
+//     );
+//   }
+// }
+
+class Application extends StatefulWidget {
   const Application({super.key});
 
   @override
+  State<Application> createState() => _ApplicationState();
+}
+
+class _ApplicationState extends State<Application> {
+  late FThemeData _currentTheme;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentTheme = FThemes.zinc.dark; // Start with your preferred default
+  }
+
+  void _setTheme(FThemeData newTheme) {
+    setState(() {
+      _currentTheme = newTheme;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final foruiTheme = FThemes.zinc.dark;
     return MaterialApp(
-      theme: foruiTheme.toApproximateMaterialTheme(),
-      builder: (_, child) => FAnimatedTheme(data: foruiTheme, child: child!),
-      home: const HomePage(),
+      theme: _currentTheme.toApproximateMaterialTheme(),
+      builder: (_, child) => FAnimatedTheme(data: _currentTheme, child: child!),
+      home: HomePage(onThemeSelected: _setTheme),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({
+    super.key,
+    required void Function(FThemeData newTheme) onThemeSelected,
+  });
 
   @override
   State<HomePage> createState() => _HomePageState();

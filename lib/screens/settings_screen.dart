@@ -74,7 +74,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.theme;
+    final theme = FTheme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
