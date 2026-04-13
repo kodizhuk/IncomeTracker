@@ -16,4 +16,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savings => 'Savings';
+
+  @override
+  String get add_income => 'Add Income';
+
+  @override
+  String get edit_income => 'Edit Income';
+
+  @override
+  String get add_expense => 'Add Expense';
+
+  @override
+  String get edit_expense => 'Edit Expense';
+
+  @override
+  String get add_savings => 'Add Savings';
+
+  @override
+  String get edit_savings => 'Edit Savings';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get currency => 'Currency';
+
+  @override
+  String get usd_equivalent => 'Equivalent:';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get update => 'Update';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get currency_hint => 'Select a currency';
+
+  @override
+  String get currency_validator => 'Please select a currency';
+
+  @override
+  String get amount_hint => 'Enter an amount';
+
+  @override
+  String get amount_validator => 'Please enter an amount';
+
+  @override
+  String get source => 'Source';
+
+  @override
+  String get source_hint => 'Enter the source of the transaction';
+
+  @override
+  String get source_validator => 'Please enter the source of the transaction';
 }

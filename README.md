@@ -116,6 +116,7 @@ A few resources to get you started if this is your first Flutter project:
 - [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 - [Flutte Tab Toggle Widgets (github lib)](https://github.com/lzyct/flutter_toggle_tab)
 - [Flutter Gems - many libs](https://fluttergems.dev/)
+- [Line Calendar](https://forui.dev/docs/data/line-calendar)
 
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,

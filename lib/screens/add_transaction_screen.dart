@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:forui/forui.dart';
+import 'package:my_money/l10n/app_localizations.dart';
 import '../models/transaction.dart';
 import '../services/database_service.dart';
 
@@ -22,75 +25,61 @@ class AddTransactionScreen extends StatefulWidget {
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
+  final FSelectController<String> _sourceController =
+      FSelectController<String>();
+  final FSelectController<String> _currencyController =
+      FSelectController<String>();
+
   DateTime _selectedDate = DateTime.now();
-  String? _selectedSource;
-  String _selectedCurrency = 'UAH';
+
   double? _convertedUsdAmount;
   List<String> _sources = [];
   final double _usdRate = 42.0; // default rate, will be updated from DB
-
+  final supported_currencies = ['UAH', 'USD', 'EUR'];
 
   @override
   void initState() {
     super.initState();
+
     if (widget.existingTransaction != null) {
       // load existing transaction data into form
       _amountController.text = widget.existingTransaction!.amount.toString();
       _selectedDate = widget.existingTransaction!.date;
-      _selectedCurrency = widget.existingTransaction!.currency;
-      _selectedSource = widget.existingTransaction!.source ?? widget.existingTransaction!.name;
-
-      if(widget.type == 'income') {
-        _loadIncomeSources();
-      } else if (widget.type == 'expense') {
-        _loadExpenseCategories();
-      }     
-    }else {
-      // load default sources for new transaction
-      if(widget.type == 'income') {
-        _loadIncomeSources();
-      } else if (widget.type == 'expense') {
-        _loadExpenseCategories();
-      }
+      _currencyController.value = widget.existingTransaction!.currency;
+      _sourceController.value =
+          widget.existingTransaction!.source ??
+          widget.existingTransaction!.name;
+      _loadSources(widget.type, false);
+    } else {
+      _currencyController.value = supported_currencies.first;
+      _loadSources(widget.type, true);
     }
+
     _updateConvertedUsdAmount();
   }
-  Future<void> _loadIncomeSources() async {
+
+  Future<void> _loadSources(String type, bool init) async {
     try {
-      final rows = await DatabaseService().getSources('income');
+      final rows = await DatabaseService().getSources(type);
       final names = rows.map((r) => (r['name'] as Object).toString()).toList();
       setState(() {
-        // _sources = names.isNotEmpty ? names.cast<String>() : widget.defaultCategories;
         _sources = names.isNotEmpty ? names : widget.defaultCategories;
-        _selectedSource ??= _sources.first;
+        if (init) {
+          _sourceController.value = _sources.isNotEmpty ? _sources.first : null;
+        }
       });
     } catch (e) {
       setState(() {
         _sources = widget.defaultCategories;
-        // _selectedSource ??= _sources.first;
-      });
-    }
-  }
-  
-  Future<void> _loadExpenseCategories() async {
-    try {
-      final rows = await DatabaseService().getSources('expense');
-      final names = rows.map((r) => (r['name'] as Object).toString()).toList();
-      setState(() {
-        _sources = names.isNotEmpty ? names : widget.defaultCategories;
-        _selectedSource ??= _sources.first;
-      });
-    } catch (e) {
-      setState(() {
-        _sources = widget.defaultCategories;
-        // _selectedSource ??= _sources.first;
       });
     }
   }
 
-  Future<void> _updateConvertedUsdAmount() async{
+  Future<void> _updateConvertedUsdAmount() async {
     setState(() {
-      if (_selectedCurrency == 'UAH') {
+      // _amountController.text =
+      //     _amountController.value.text; // Trigger onChange to update USD amount
+      if (_currencyController.value == 'UAH') {
         final double? amount = double.tryParse(_amountController.text);
         if (amount != null) {
           _convertedUsdAmount = amount / _usdRate;
@@ -106,19 +95,32 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.existingTransaction != null;
+    final l10n = AppLocalizations.of(context)!;
 
-    // Ensure selected source is valid after loading sources
-    if (_sources.isNotEmpty && !_sources.contains(_selectedSource)) {
-      _selectedSource = _sources.first;  // Or: _selectedSource = _sources.first;
-    }
+    var page_header = Text(
+      isEditing
+          ? widget.type == 'income'
+                ? l10n.edit_income
+                : widget.type == 'expense'
+                ? l10n.edit_expense
+                : l10n.edit_savings
+          : widget.type == 'income'
+          ? l10n.add_income
+          : widget.type == 'expense'
+          ? l10n.add_expense
+          : l10n.add_savings,
+    );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing
-            ? 'Edit ${widget.type == 'income' ? 'Income' : widget.type == 'expense' ? 'Expense' : 'Saving'}'
-            : 'Add ${widget.type == 'income' ? 'Income' : widget.type == 'expense' ? 'Expense' : 'Saving'}'),
+    final theme = FTheme.of(context);
+    final colors = theme.colors;
+    final text = theme.typography;
+
+    return FScaffold(
+      header: FHeader.nested(
+        title: page_header,
+        prefixes: [FHeaderAction.back(onPress: () => Navigator.pop(context))],
       ),
-      body: Padding(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -128,89 +130,104 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      controller: _amountController,
-                      decoration: const InputDecoration(
-                        labelText: 'Amount',
+                    flex: 6,
+                    child: FTextFormField(
+                      control: .managed(
+                        controller: _amountController,
+                        onChange: (value) {
+                          _updateConvertedUsdAmount();
+                        },
                       ),
+                      hint: l10n.amount_hint,
+                      label: Text(l10n.amount),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter an amount';
+                          return l10n.amount_validator;
                         }
                         if (double.tryParse(value) == null) {
-                          return 'Please enter a valid number';
+                          return l10n.amount_validator;
                         }
                         return null;
-                      },
-                      onChanged: (String value) {
-                        _updateConvertedUsdAmount();
                       },
                     ),
                   ),
                   const SizedBox(width: 12),
-                  SizedBox(
-                    width: 120,
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _selectedCurrency,
-                      decoration: const InputDecoration(
-                        labelText: 'Currency',
-                      ),
-                      items: ['UAH', 'USD', 'EUR'].map((c) {
-                        return DropdownMenuItem(
-                          value: c,
-                          child: Text(c),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _selectedCurrency = value;
-                          });
-                        }
-                      },
+                  Expanded(
+                    flex: 4,
+                    child: FSelect<String>.rich(
+                      control: .managed(controller: _currencyController),
+                      label: Text(l10n.currency),
+                      format: (s) => s,
+                      hint: l10n.currency_hint,
+                      validator: (currency) =>
+                          currency == null ? l10n.currency_validator : null,
+                      children: [
+                        for (final currency in supported_currencies)
+                          .item(title: Text(currency), value: currency),
+                      ],
                     ),
                   ),
                 ],
               ),
-              if (_selectedCurrency == 'UAH' && _convertedUsdAmount != null) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    'USD Equivalent: ${_convertedUsdAmount!.toStringAsFixed(2)} USD',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.green[700],
-                        ),
+              if (_currencyController.value == 'UAH' &&
+                  _convertedUsdAmount != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  '${l10n.usd_equivalent} ${_convertedUsdAmount!.toStringAsFixed(2)} \$',
+                  style: text.sm.copyWith(color: colors.primary),
+                ),
+              ],
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: FSelect<String>.rich(
+                      control: .managed(controller: _sourceController),
+                      label: Text(l10n.source),
+                      format: (s) => s,
+                      hint: l10n.source_hint,
+                      validator: (source) =>
+                          source == null ? l10n.source_validator : null,
+                      children: [
+                        for (final source in _sources)
+                          .item(title: Text(source), value: source),
+                      ],
+                    ),
                   ),
                 ],
-              const SizedBox(height: 16),
-              DropdownButtonFormField <String>(
-                initialValue: _selectedSource,
-                items: _sources.map((source) {
-                  return DropdownMenuItem(
-                    value: source,
-                    child: Text(source),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedSource = value;
-                  });
-                },
               ),
               const SizedBox(height: 16),
-              ListTile(
-                title: const Text('Date'),
-                subtitle: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: _selectDate,
+              Row(
+                children: [
+                  Expanded(
+                    child: FDateField.calendar(
+                      label: Text(l10n.date),
+                      control: .managed(
+                        initial: _selectedDate,
+                        onChange: (date) {
+                          _selectedDate = date!;
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveTransaction,
-                  child: Text(isEditing ? 'Update' : 'Save'),
-                ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: FButton(
+                      onPress: () {
+                        if (_formKey.currentState!.validate()) {
+                          // Form is valid
+                          _saveTransaction();
+                        }
+                      },
+                      child: Text(isEditing ? l10n.update : l10n.save),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -219,43 +236,27 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
   void _saveTransaction() async {
     if (_formKey.currentState!.validate()) {
-
       final rates = await DatabaseService().getExchangeRates();
       final usdRate = rates['usd'] ?? _usdRate;
       final transaction = Transaction(
         id: widget.existingTransaction?.id,
         type: widget.type,
         date: _selectedDate,
-        name: _selectedSource!,
+        name: _sourceController.value!,
         amount: double.parse(_amountController.text),
         amount_usd: (() {
           double amount = double.parse(_amountController.text);
-          return _selectedCurrency == 'UAH' 
-            ? (amount / usdRate * 100).round() / 100.0 
-            : (amount * 100).round() / 100.0;
+          return _currencyController.value == 'UAH'
+              ? (amount / usdRate * 100).round() / 100.0
+              : (amount * 100).round() / 100.0;
         }()),
-        source: _selectedSource,
-        currency: _selectedCurrency,
+        source: _sourceController.value!,
+        currency: _currencyController.value!,
       );
 
       Navigator.pop(context, transaction);
-
     }
   }
 

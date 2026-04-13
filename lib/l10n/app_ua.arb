@@ -2,5 +2,25 @@
   "@@locale": "uk",
   "income": "Прибуток",
   "expenses": "Витрати",
-  "savings": "Заощадження"
+  "savings": "Заощадження",
+
+  "add_income": "Додати прибуток",
+  "edit_income": "Редагувати прибуток",
+  "add_expense": "Додати витрати",
+  "edit_expense": "Редагувати витрати",
+  "add_savings": "Додати заощадження",
+  "edit_savings": "Редагувати заощадження",
+  "amount": "Сума",
+  "currency": "Валюта",
+  "usd_equivalent": "Еквівалент:",
+  "save": "Зберегти",
+  "update": "Оновити",
+  "date": "Дата",
+  "currency_hint": "Виберіть валюту",
+  "currency_validator": "Будь ласка, виберіть валюта",
+  "amount_hint": "Введіть суму",
+  "amount_validator": "Будь ласка, введіть суму",
+  "source": "Джерело",
+  "source_hint": "Введіть джерело транзакції",
+  "source_validator": "Будь ласка, введите джерело транзакції"
 }

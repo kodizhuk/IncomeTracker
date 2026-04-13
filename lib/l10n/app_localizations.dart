@@ -112,6 +112,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Savings'**
   String get savings;
+
+  /// No description provided for @add_income.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Income'**
+  String get add_income;
+
+  /// No description provided for @edit_income.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Income'**
+  String get edit_income;
+
+  /// No description provided for @add_expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Expense'**
+  String get add_expense;
+
+  /// No description provided for @edit_expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Expense'**
+  String get edit_expense;
+
+  /// No description provided for @add_savings.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Savings'**
+  String get add_savings;
+
+  /// No description provided for @edit_savings.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Savings'**
+  String get edit_savings;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currency;
+
+  /// No description provided for @usd_equivalent.
+  ///
+  /// In en, this message translates to:
+  /// **'Equivalent:'**
+  String get usd_equivalent;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @currency_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a currency'**
+  String get currency_hint;
+
+  /// No description provided for @currency_validator.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a currency'**
+  String get currency_validator;
+
+  /// No description provided for @amount_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount'**
+  String get amount_hint;
+
+  /// No description provided for @amount_validator.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an amount'**
+  String get amount_validator;
+
+  /// No description provided for @source.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get source;
+
+  /// No description provided for @source_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the source of the transaction'**
+  String get source_hint;
+
+  /// No description provided for @source_validator.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the source of the transaction'**
+  String get source_validator;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

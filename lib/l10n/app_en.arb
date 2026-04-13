@@ -1,6 +1,26 @@
 {
-  "@@locale": "en",
-  "income": "Income",
-  "expenses": "Expenses",
-  "savings": "Savings"
+    "@@locale": "en",
+    "income": "Income",
+    "expenses": "Expenses",
+    "savings": "Savings",
+
+    "add_income": "Add Income",
+    "edit_income": "Edit Income",
+    "add_expense": "Add Expense",
+    "edit_expense": "Edit Expense",
+    "add_savings": "Add Savings",
+    "edit_savings": "Edit Savings",
+    "amount": "Amount",
+    "currency": "Currency",
+    "usd_equivalent": "Equivalent:",
+    "save": "Save",
+    "update": "Update",
+    "date": "Date",
+    "currency_hint": "Select a currency",
+    "currency_validator": "Please select a currency",
+    "amount_hint": "Enter an amount",
+    "amount_validator": "Please enter an amount",
+    "source": "Source",
+    "source_hint": "Enter the source of the transaction",
+    "source_validator": "Please enter the source of the transaction"
 }

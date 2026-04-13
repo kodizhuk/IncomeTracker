@@ -100,6 +100,7 @@ class _AppStates extends State<AppStates> {
           ],
         ),
         child: _screens[_selectedIndex],
+        // child: _contents[_selectedIndex],
       ),
     );
   }

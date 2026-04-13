@@ -7,6 +7,10 @@ import 'add_transaction_screen.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
 
+import 'package:forui/forui.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import '../l10n/app_localizations.dart';
+
 class IncomeScreen extends StatefulWidget {
   final ValueNotifier<int>? navIndexNotifier;
   const IncomeScreen({super.key, this.navIndexNotifier});
