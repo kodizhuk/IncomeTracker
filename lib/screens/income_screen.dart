@@ -4,8 +4,6 @@ import '../models/transaction.dart';
 import '../services/database_service.dart';
 import '../widgets/transaction_item.dart';
 import 'add_transaction_screen.dart';
-import 'settings_screen.dart';
-import 'statistics_screen.dart';
 
 import 'package:forui/forui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -38,9 +36,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
   // methods for the current view
   DateTime _selectedDate = DateTime.now();
   String _getDate() {
+    final locale = Localizations.localeOf(context).toLanguageTag();
     return _showAllTime
         ? 'All Time'
-        : DateFormat('MMMM yyyy').format(_selectedDate);
+        : DateFormat('LLLL yyyy', locale).format(_selectedDate);
   }
 
   void _nextDate() {
@@ -232,75 +231,21 @@ class _IncomeScreenState extends State<IncomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Income'),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 8.0),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.account_balance,
-                  color: Colors.white,
-                  size: 18,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  'Tithe: ${_calculateTithe()}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.show_chart),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const StatisticsScreen(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-          ),
-        ],
-      ),
-
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : Column(
                 children: [
-                  // Date selector row (fixed height)
                   SizedBox(
-                    height: 50, // Fixed height for buttons + padding
+                    height: 50,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.arrow_left),
-                          iconSize: 48.0,
-                          tooltip: 'Previous Date',
-                          onPressed: _showAllTime ? null : _previousDate,
+                      children: [
+                        FButton(
+                          onPress: _showAllTime ? null : _previousDate,
+                          style: FButtonStyle.ghost(),
+                          child: const Icon(FIcons.chevronLeft),
                         ),
 
                         GestureDetector(
@@ -324,18 +269,16 @@ class _IncomeScreenState extends State<IncomeScreen> {
                           ),
                         ),
 
-                        IconButton(
-                          icon: const Icon(Icons.arrow_right),
-                          iconSize: 48.0,
-                          tooltip: 'Next Date',
-                          onPressed: _showAllTime ? null : _nextDate,
+                        FButton(
+                          onPress: _showAllTime ? null : _nextDate,
+                          style: FButtonStyle.ghost(),
+                          child: const Icon(FIcons.chevronRight),
                         ),
                       ],
                     ),
                   ),
-                  // Income transactions list (takes remaining space)
                   _incomeTransactions.isEmpty
-                      ? const Text(
+                      ? Text(
                           'No income transactions yet',
                           style: TextStyle(fontSize: 18, color: Colors.grey),
                         )
@@ -354,7 +297,6 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 ],
               ),
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: _addTransaction,
         child: const Icon(Icons.add),

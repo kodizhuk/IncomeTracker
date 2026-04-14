@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_money/screens/settings_screen.dart';
+import 'package:my_money/screens/statistics_screen.dart';
 import 'l10n/app_localizations.dart';
 
 import 'screens/income_screen.dart';
@@ -63,24 +65,52 @@ class _AppStates extends State<AppStates> {
 
   List<Widget> get _screens => <Widget>[
     IncomeScreen(navIndexNotifier: _selectedIndexNotifier),
-    ExpensesScreen(navIndexNotifier: _selectedIndexNotifier),
+    IncomeScreen(navIndexNotifier: _selectedIndexNotifier),
+    // ExpensesScreen(navIndexNotifier: _selectedIndexNotifier),
     SavingsScreen(navIndexNotifier: _selectedIndexNotifier),
   ];
+
+  FHeader _buildHeader(BuildContext context, String title) {
+    return FHeader(
+      title: Text(title),
+      suffixes: [
+        FHeaderAction(
+          icon: const Icon(FIcons.chartColumn),
+          onPress: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const StatisticsScreen()),
+            );
+          },
+        ),
+        const SizedBox(width: 6),
+        FHeaderAction(
+          icon: const Icon(FIcons.settings),
+          onPress: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          },
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    final _headers = [
-      FHeader(title: Text(l10n.income)),
-      FHeader(title: Text(l10n.expenses)),
-      FHeader(title: Text(l10n.savings)),
+    final headers = [
+      _buildHeader(context, l10n.income),
+      _buildHeader(context, l10n.expenses),
+      _buildHeader(context, l10n.savings),
     ];
 
     return SizedBox(
       height: 500,
       child: FScaffold(
-        header: _headers[_selectedIndex],
+        header: headers[_selectedIndex],
         footer: FBottomNavigationBar(
           index: _selectedIndex,
           onChange: (index) => setState(() => _selectedIndex = index),
