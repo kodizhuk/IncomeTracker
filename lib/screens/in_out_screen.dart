@@ -9,15 +9,17 @@ import 'package:forui/forui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import '../l10n/app_localizations.dart';
 
-class IncomeScreen extends StatefulWidget {
+class InOutScreen extends StatefulWidget {
   final ValueNotifier<int>? navIndexNotifier;
-  const IncomeScreen({super.key, this.navIndexNotifier});
+  final String type;
+
+  const InOutScreen({super.key, this.navIndexNotifier, required this.type});
 
   @override
-  State<IncomeScreen> createState() => _IncomeScreenState();
+  State<InOutScreen> createState() => _InOutScreenState();
 }
 
-class _IncomeScreenState extends State<IncomeScreen> {
+class _InOutScreenState extends State<InOutScreen> {
   final DatabaseService _dbService = DatabaseService();
   List<Transaction> _incomeTransactions = [];
   List<Transaction> _allIncomeTransactions = [];
@@ -32,6 +34,22 @@ class _IncomeScreenState extends State<IncomeScreen> {
     'Freelance',
     'Investments',
   ];
+
+  final List<String> expenseCategoriesDefault = [
+    'Tithe',
+    'Donations',
+    'Rent',
+    'Transport',
+  ];
+
+  List<Transaction> get _activeTransactions =>
+      widget.type == 'income' ? _incomeTransactions : _expenseTransactions;
+
+  List<String> get _activeDefaultCategories => widget.type == 'income'
+      ? incomeCategoriesDefault
+      : expenseCategoriesDefault;
+
+  bool get _isIncomeView => widget.type == 'income';
 
   // methods for the current view
   DateTime _selectedDate = DateTime.now();
@@ -121,8 +139,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => AddTransactionScreen(
-          type: 'income',
-          defaultCategories: incomeCategoriesDefault,
+          type: _isIncomeView ? 'income' : 'expense',
+          defaultCategories: _activeDefaultCategories,
         ),
       ),
     );
@@ -140,7 +158,7 @@ class _IncomeScreenState extends State<IncomeScreen> {
   }
 
   void _deleteTransaction(int index) async {
-    final transaction = _incomeTransactions[index];
+    final transaction = _activeTransactions[index];
     if (transaction.id != null) {
       try {
         await _dbService.deleteTransaction(transaction.id!);
@@ -154,13 +172,13 @@ class _IncomeScreenState extends State<IncomeScreen> {
   }
 
   void _editTransaction(int index) async {
-    final transaction = _incomeTransactions[index];
+    final transaction = _activeTransactions[index];
     final result = await Navigator.push<Transaction>(
       context,
       MaterialPageRoute(
         builder: (context) => AddTransactionScreen(
-          type: 'income',
-          defaultCategories: incomeCategoriesDefault,
+          type: _isIncomeView ? 'income' : 'expense',
+          defaultCategories: _activeDefaultCategories,
           existingTransaction: transaction,
         ),
       ),
@@ -183,24 +201,6 @@ class _IncomeScreenState extends State<IncomeScreen> {
       0,
       (sum, transaction) => sum + transaction.amount,
     );
-  }
-
-  String _formatTotal() {
-    String symbol = '₴';
-    if (_incomeTransactions.isNotEmpty) {
-      switch (_incomeTransactions.first.currency) {
-        case 'USD':
-          symbol = r'$';
-          break;
-        case 'EUR':
-          symbol = '€';
-          break;
-        case 'UAH':
-        default:
-          symbol = '₴';
-      }
-    }
-    return 'Total Income: $symbol${_totalIncome.toStringAsFixed(2)}';
   }
 
   String _calculateTithe() {
@@ -230,6 +230,8 @@ class _IncomeScreenState extends State<IncomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final activeTransactions = _activeTransactions;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -277,17 +279,22 @@ class _IncomeScreenState extends State<IncomeScreen> {
                       ],
                     ),
                   ),
-                  _incomeTransactions.isEmpty
+                  activeTransactions.isEmpty
                       ? Text(
-                          'No income transactions yet',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                          widget.type == 'income'
+                              ? 'No income transactions yet'
+                              : 'No expense transactions yet',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
                         )
                       : Expanded(
                           child: ListView.builder(
-                            itemCount: _incomeTransactions.length,
+                            itemCount: activeTransactions.length,
                             itemBuilder: (context, index) {
                               return TransactionItem(
-                                transaction: _incomeTransactions[index],
+                                transaction: activeTransactions[index],
                                 onDelete: () => _deleteTransaction(index),
                                 onEdit: () => _editTransaction(index),
                               );

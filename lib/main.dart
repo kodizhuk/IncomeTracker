@@ -5,7 +5,7 @@ import 'package:my_money/screens/settings_screen.dart';
 import 'package:my_money/screens/statistics_screen.dart';
 import 'l10n/app_localizations.dart';
 
-import 'screens/income_screen.dart';
+import 'screens/in_out_screen.dart';
 import 'screens/expenses_screen.dart';
 import 'screens/savings_screen.dart';
 
@@ -64,9 +64,8 @@ class _AppStates extends State<AppStates> {
   final ValueNotifier<int> _selectedIndexNotifier = ValueNotifier<int>(0);
 
   List<Widget> get _screens => <Widget>[
-    IncomeScreen(navIndexNotifier: _selectedIndexNotifier),
-    IncomeScreen(navIndexNotifier: _selectedIndexNotifier),
-    // ExpensesScreen(navIndexNotifier: _selectedIndexNotifier),
+    InOutScreen(navIndexNotifier: _selectedIndexNotifier, type: 'income'),
+    InOutScreen(navIndexNotifier: _selectedIndexNotifier, type: 'expenses'),
     SavingsScreen(navIndexNotifier: _selectedIndexNotifier),
   ];
 
