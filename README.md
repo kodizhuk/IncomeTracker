@@ -72,6 +72,11 @@ IncomeTracker is a financial tracker that simplifies managing your income, expen
      ```bash
         \MyMoney\.dart_tool\sqflite_common_ffi\databases
       ```
+4. **How to...**:
+    - **Update Localisation files**
+    ```bash
+        flutter gen-l10n
+    ```
 
 ## Folder Structure
 ```bash

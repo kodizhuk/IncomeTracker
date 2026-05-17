@@ -22,5 +22,10 @@
     "amount_validator": "Please enter an amount",
     "source": "Source",
     "source_hint": "Enter the source of the transaction",
-    "source_validator": "Please enter the source of the transaction"
+    "source_validator": "Please enter the source of the transaction",
+    "savings_src": "Account Name",
+    "savings_src_hint": "Enter the savings account name",
+    "savings_src_validator": "Please enter the name of the savings account",
+    "note_add": "Add Note",
+    "note_hint": "Optional"
 }

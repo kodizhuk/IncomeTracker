@@ -73,4 +73,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get source_validator => 'Please enter the source of the transaction';
+
+  @override
+  String get savings_src => 'Account Name';
+
+  @override
+  String get savings_src_hint => 'Enter the savings account name';
+
+  @override
+  String get savings_src_validator => 'Please enter the name of the savings account';
+
+  @override
+  String get note_add => 'Add Note';
+
+  @override
+  String get note_hint => 'Optional';
 }

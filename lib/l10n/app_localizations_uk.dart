@@ -73,4 +73,19 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get source_validator => 'Будь ласка, введите джерело транзакції';
+
+  @override
+  String get savings_src => 'Назва аккаунта';
+
+  @override
+  String get savings_src_hint => 'Введіть назву аккаунта';
+
+  @override
+  String get savings_src_validator => 'Будь ласка, введіть назву аккаунта';
+
+  @override
+  String get note_add => 'Добавити нотатку';
+
+  @override
+  String get note_hint => 'Необовязково';
 }

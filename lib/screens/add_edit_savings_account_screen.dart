@@ -8,10 +8,12 @@ class AddEditSavingsAccountScreen extends StatefulWidget {
   const AddEditSavingsAccountScreen({super.key, this.account});
 
   @override
-  State<AddEditSavingsAccountScreen> createState() => _AddEditSavingsAccountScreenState();
+  State<AddEditSavingsAccountScreen> createState() =>
+      _AddEditSavingsAccountScreenState();
 }
 
-class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScreen> {
+class _AddEditSavingsAccountScreenState
+    extends State<AddEditSavingsAccountScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _amountController = TextEditingController();
@@ -64,9 +66,7 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
                   Expanded(
                     child: TextFormField(
                       controller: _amountController,
-                      decoration: const InputDecoration(
-                        labelText: 'Amount',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Amount'),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -84,14 +84,9 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
                     width: 120,
                     child: DropdownButtonFormField<String>(
                       initialValue: _selectedCurrency,
-                      decoration: const InputDecoration(
-                        labelText: 'Currency',
-                      ),
+                      decoration: const InputDecoration(labelText: 'Currency'),
                       items: ['UAH', 'USD', 'EUR'].map((c) {
-                        return DropdownMenuItem(
-                          value: c,
-                          child: Text(c),
-                        );
+                        return DropdownMenuItem(value: c, child: Text(c));
                       }).toList(),
                       onChanged: (value) {
                         if (value != null) {
@@ -130,7 +125,6 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
 
   void _saveAccount() async {
     if (_formKey.currentState!.validate()) {
-
       final rates = await DatabaseService().getExchangeRates();
       final usdRate = rates['usd'] ?? _settingsUsdRate;
       final account = SavingsAccount(
@@ -139,7 +133,8 @@ class _AddEditSavingsAccountScreenState extends State<AddEditSavingsAccountScree
         amount: double.parse(_amountController.text),
         amountUSD: _selectedCurrency == 'USD'
             ? double.parse(_amountController.text)
-            : (double.parse(_amountController.text) / usdRate * 100).round() / 100.0,
+            : (double.parse(_amountController.text) / usdRate * 100).round() /
+                  100.0,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         currency: _selectedCurrency,
         lastUpdated: DateTime.now(),

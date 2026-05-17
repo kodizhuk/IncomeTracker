@@ -226,6 +226,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter the source of the transaction'**
   String get source_validator;
+
+  /// No description provided for @savings_src.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Name'**
+  String get savings_src;
+
+  /// No description provided for @savings_src_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the savings account name'**
+  String get savings_src_hint;
+
+  /// No description provided for @savings_src_validator.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the name of the savings account'**
+  String get savings_src_validator;
+
+  /// No description provided for @note_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Note'**
+  String get note_add;
+
+  /// No description provided for @note_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get note_hint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

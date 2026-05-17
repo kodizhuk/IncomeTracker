@@ -28,16 +28,21 @@ class SavingsAccountWidget extends StatelessWidget {
       default:
         symbol = '₴';
     }
-    final currencyFormat = NumberFormat.currency(symbol: symbol, decimalDigits: 0);
+    final currencyFormat = NumberFormat.currency(
+      symbol: symbol,
+      decimalDigits: 0,
+    );
 
     return GestureDetector(
-      onTap: onEdit,  // ← Tap anywhere → Edit
-      onLongPress: onDelete,  // ← Long press → Delete (replaces menu)
-      child: InkWell(  // ← Ripple effect on tap
-        borderRadius: BorderRadius.circular(12),  // Match Card radius
+      onTap: onEdit, // ← Tap anywhere → Edit
+      onLongPress: onDelete, // ← Long press → Delete (replaces menu)
+      child: InkWell(
+        // ← Ripple effect on tap
+        borderRadius: BorderRadius.circular(12), // Match Card radius
         child: Card(
           margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          shape: RoundedRectangleBorder(  // Rounded corners
+          shape: RoundedRectangleBorder(
+            // Rounded corners
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
@@ -59,23 +64,23 @@ class SavingsAccountWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                Text(
-                  currencyFormat.format(account.amount),
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
-                ),
-                if (account.notes != null && account.notes!.isNotEmpty)
-                  Text(
-                    '${account.notes}',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-                Text(
-                  DateFormat.yMMMd().format(account.lastUpdated),
-                  style: TextStyle(color: Colors.grey[500]),
-                ),
+                // Text(
+                //   currencyFormat.format(account.amount),
+                //   style: const TextStyle(
+                //     fontSize: 24,
+                //     fontWeight: FontWeight.bold,
+                //     color: Colors.green,
+                //   ),
+                // ),
+                // if (account.notes != null && account.notes!.isNotEmpty)
+                //   Text(
+                //     '${account.notes}',
+                //     style: TextStyle(color: Colors.grey[600]),
+                //   ),
+                // Text(
+                //   DateFormat.yMMMd().format(account.lastUpdated),
+                //   style: TextStyle(color: Colors.grey[500]),
+                // ),
               ],
             ),
           ),
