@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/savings_account.dart';
 import '../services/database_service.dart';
-import 'add_edit_savings_account_screen.dart';
+import 'add_savings_screen.dart';
 import '../widgets/savings_account_widget.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
@@ -256,12 +256,11 @@ class _SavingsScreenState extends State<SavingsScreen> {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Color.fromARGB(255, 255, 194, 194),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 150, // Set a fixed height for the GridView
+                  Expanded(
                     child: _savingsAccounts.isEmpty
                         ? Center(
                             child: Column(
@@ -291,19 +290,24 @@ class _SavingsScreenState extends State<SavingsScreen> {
                               ],
                             ),
                           )
-                        : GridView.count(
-                            crossAxisCount: 2,
+                        : GridView.builder(
                             padding: EdgeInsets.zero,
-                            mainAxisSpacing: 2.0,
-                            crossAxisSpacing: 2.0,
-                            childAspectRatio: 1.6,
-                            children: _savingsAccounts.map<Widget>((account) {
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 8,
+                                  crossAxisSpacing: 8,
+                                  childAspectRatio: 1.6,
+                                ),
+                            itemCount: _savingsAccounts.length,
+                            itemBuilder: (context, index) {
+                              final account = _savingsAccounts[index];
                               return SavingsAccountWidget(
                                 account: account,
                                 onEdit: () => _editSavingsAccount(account),
                                 onDelete: () => _deleteSavingsAccount(account),
                               );
-                            }).toList(),
+                            },
                           ),
                   ),
                 ],

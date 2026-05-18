@@ -5,7 +5,7 @@ import 'package:my_money/screens/settings_screen.dart';
 import 'package:my_money/screens/statistics_screen.dart';
 import 'l10n/app_localizations.dart';
 
-import 'screens/in_out_screen.dart';
+import 'screens/transaction_screen.dart';
 import 'screens/savings_screen.dart';
 
 void main() {

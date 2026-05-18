@@ -64,23 +64,23 @@ class SavingsAccountWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                // Text(
-                //   currencyFormat.format(account.amount),
-                //   style: const TextStyle(
-                //     fontSize: 24,
-                //     fontWeight: FontWeight.bold,
-                //     color: Colors.green,
-                //   ),
-                // ),
-                // if (account.notes != null && account.notes!.isNotEmpty)
-                //   Text(
-                //     '${account.notes}',
-                //     style: TextStyle(color: Colors.grey[600]),
-                //   ),
-                // Text(
-                //   DateFormat.yMMMd().format(account.lastUpdated),
-                //   style: TextStyle(color: Colors.grey[500]),
-                // ),
+                Text(
+                  currencyFormat.format(account.amount),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+                if (account.notes != null && account.notes!.isNotEmpty)
+                  Text(
+                    '${account.notes}',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                Text(
+                  DateFormat.yMMMd().format(account.lastUpdated),
+                  style: TextStyle(color: Colors.grey[500]),
+                ),
               ],
             ),
           ),
