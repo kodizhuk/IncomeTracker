@@ -201,7 +201,7 @@ class _AddEditSavingsAccountScreenState
             : (double.parse(_amountController.text) / usdRate * 100).round() /
                   100.0,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
-        currency: _selectedCurrency,
+        currency: _currencyController.value!,
         lastUpdated: DateTime.now(),
       );
 
