@@ -24,16 +24,28 @@ class AppLocalizationsUk extends AppLocalizations {
   String get edit_income => 'Редагувати прибуток';
 
   @override
+  String get income_empty => 'Нажміть кнопку +, щоб додати перший прибуток.';
+
+  @override
   String get add_expense => 'Додати витрати';
 
   @override
   String get edit_expense => 'Редагувати витрати';
 
   @override
+  String get expenses_empty => 'Нажміть кнопку +, щоб додати перші витрати.';
+
+  @override
   String get add_savings => 'Додати заощадження';
 
   @override
   String get edit_savings => 'Редагувати заощадження';
+
+  @override
+  String get total_savings => 'Сума заощаджень';
+
+  @override
+  String get savings_empty => 'Нажміть кнопку +, щоб додати аккаунт.';
 
   @override
   String get amount => 'Сума';
@@ -88,4 +100,40 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get note_hint => 'Необовязково';
+
+  @override
+  String get settings => 'Налаштування';
+
+  @override
+  String get language => 'Мова';
+
+  @override
+  String get export_data => 'Експот даних';
+
+  @override
+  String get import_data => 'Імпорт даних';
+
+  @override
+  String get clear_db => 'Очистити базу даних';
+
+  @override
+  String get clear_db_hint => 'Видалити всі транзакції та заощадження';
+
+  @override
+  String get income_src => 'Джерела прибутку';
+
+  @override
+  String get income_src_hint => 'Керувати списком джерел прибутку ';
+
+  @override
+  String get expense_src => 'Категорії витрат';
+
+  @override
+  String get expense_src_hint => 'Керувати категоріями витрат';
+
+  @override
+  String get about => 'Про програму';
+
+  @override
+  String get what_new => 'Що нового';
 }

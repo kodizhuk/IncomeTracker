@@ -6,10 +6,14 @@
 
     "add_income": "Add Income",
     "edit_income": "Edit Income",
+    "income_empty": "Tap the + button to add first income.",
     "add_expense": "Add Expense",
     "edit_expense": "Edit Expense",
+    "expenses_empty": "Tap the + button to add first expense.",
     "add_savings": "Add Savings",
     "edit_savings": "Edit Savings",
+    "total_savings": "Total Savings",
+    "savings_empty": "Tap the + button to add an account.",
     "amount": "Amount",
     "currency": "Currency",
     "usd_equivalent": "Equivalent:",
@@ -27,5 +31,18 @@
     "savings_src_hint": "Enter the savings account name",
     "savings_src_validator": "Please enter the name of the savings account",
     "note_add": "Add Note",
-    "note_hint": "Optional"
+    "note_hint": "Optional",
+    "settings": "Settings",
+    "language": "Language",
+    "export_data": "Export Data",
+    "import_data": "Import Data",
+    "clear_db": "Clear Database",
+    "clear_db_hint":"Delete all transactions, savings and sources",
+    "income_src": "Income Sources",
+    "income_src_hint": "Manage income sources and categories",
+    "expense_src": "Expense Categories",
+    "expense_src_hint": "Manage expense categories",
+    "about": "About",
+    "what_new": "What's New"
+
 }

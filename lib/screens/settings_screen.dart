@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'edit_sources_screen.dart';
 import 'edit_categories_screen.dart';
+import '../l10n/app_localizations.dart';
 
 import 'package:forui/forui.dart';
 
@@ -75,10 +76,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -143,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 ListTile(
                   leading: const Icon(Icons.language),
-                  title: const Text('Language'),
+                  title: Text(l10n.language),
                   subtitle: const Text('English'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
@@ -159,8 +161,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 ListTile(
                   leading: const Icon(Icons.download),
-                  title: const Text('Export All'),
-                  subtitle: const Text('to CSV file'),
+                  title: Text(l10n.export_data),
+                  subtitle: Text('to CSV file'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () async {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -184,7 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 ListTile(
                   leading: const Icon(Icons.upload),
-                  title: const Text('Import All'),
+                  title: Text(l10n.import_data),
                   subtitle: const Text('from CSV file'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () async {
@@ -218,16 +220,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: const Text('Clear Database'),
-                  subtitle: const Text(
-                    'Delete all transactions, savings, and sources',
-                  ),
+                  title: Text(l10n.clear_db),
+                  subtitle: Text(l10n.clear_db_hint),
                   trailing: const Icon(Icons.warning, color: Colors.red),
                   onTap: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('Clear Database'),
+                        title: Text(l10n.clear_db),
                         content: const Text(
                           'This will permanently delete all your transactions, savings accounts, and sources. This action cannot be undone. Are you sure?',
                         ),
@@ -269,8 +269,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 ListTile(
                   leading: const Icon(Icons.edit),
-                  title: const Text('Income Sources'),
-                  subtitle: const Text('Manage income sources and categories'),
+                  title: Text(l10n.income_src),
+                  subtitle: Text(l10n.income_src_hint),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     Navigator.push(
@@ -285,8 +285,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.edit),
-                  title: const Text('Expance Categories'),
-                  subtitle: const Text('Manage expense categories'),
+                  title: Text(l10n.expense_src),
+                  subtitle: Text(l10n.expense_src_hint),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     Navigator.push(
@@ -300,7 +300,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.info),
-                  title: const Text('About'),
+                  title: Text(l10n.about),
                   subtitle: const Text('Money Tracker v0.0.1'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
@@ -322,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.new_releases),
-                  title: const Text('What\'s New'),
+                  title: Text(l10n.what_new),
                   subtitle: const Text('Version 0.0.1'),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {

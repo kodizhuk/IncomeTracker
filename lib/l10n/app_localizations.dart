@@ -125,6 +125,12 @@ abstract class AppLocalizations {
   /// **'Edit Income'**
   String get edit_income;
 
+  /// No description provided for @income_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to add first income.'**
+  String get income_empty;
+
   /// No description provided for @add_expense.
   ///
   /// In en, this message translates to:
@@ -137,6 +143,12 @@ abstract class AppLocalizations {
   /// **'Edit Expense'**
   String get edit_expense;
 
+  /// No description provided for @expenses_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to add first expense.'**
+  String get expenses_empty;
+
   /// No description provided for @add_savings.
   ///
   /// In en, this message translates to:
@@ -148,6 +160,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit Savings'**
   String get edit_savings;
+
+  /// No description provided for @total_savings.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Savings'**
+  String get total_savings;
+
+  /// No description provided for @savings_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to add an account.'**
+  String get savings_empty;
 
   /// No description provided for @amount.
   ///
@@ -256,6 +280,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Optional'**
   String get note_hint;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @export_data.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Data'**
+  String get export_data;
+
+  /// No description provided for @import_data.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Data'**
+  String get import_data;
+
+  /// No description provided for @clear_db.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Database'**
+  String get clear_db;
+
+  /// No description provided for @clear_db_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all transactions, savings and sources'**
+  String get clear_db_hint;
+
+  /// No description provided for @income_src.
+  ///
+  /// In en, this message translates to:
+  /// **'Income Sources'**
+  String get income_src;
+
+  /// No description provided for @income_src_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage income sources and categories'**
+  String get income_src_hint;
+
+  /// No description provided for @expense_src.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense Categories'**
+  String get expense_src;
+
+  /// No description provided for @expense_src_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage expense categories'**
+  String get expense_src_hint;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @what_new.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s New'**
+  String get what_new;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

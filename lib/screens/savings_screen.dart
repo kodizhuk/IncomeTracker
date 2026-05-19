@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/savings_account.dart';
@@ -6,6 +8,7 @@ import 'add_savings_screen.dart';
 import '../widgets/savings_account_widget.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class SavingsScreen extends StatefulWidget {
   final ValueNotifier<int>? navIndexNotifier;
@@ -175,32 +178,8 @@ class _SavingsScreenState extends State<SavingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Savings'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.show_chart),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const StatisticsScreen(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-          ),
-        ],
-      ),
       body: Padding(
         padding: EdgeInsets.all(8),
         child: _isLoading
@@ -252,7 +231,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                     padding: const EdgeInsets.all(8),
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Total Savings: ${_formatTotalSavings()}',
+                      '${l10n.total_savings}: ${_formatTotalSavings()}',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -273,18 +252,10 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'No savings accounts yet',
+                                  l10n.savings_empty,
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.grey[600],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Tap + to add your first savings account',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[500],
                                   ),
                                 ),
                               ],

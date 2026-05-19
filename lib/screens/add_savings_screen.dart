@@ -73,7 +73,7 @@ class _AddEditSavingsAccountScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Savings Account' : 'Add Savings Account'),
+        title: Text(isEditing ? l10n.edit_savings : l10n.add_savings),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

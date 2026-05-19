@@ -24,16 +24,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit_income => 'Edit Income';
 
   @override
+  String get income_empty => 'Tap the + button to add first income.';
+
+  @override
   String get add_expense => 'Add Expense';
 
   @override
   String get edit_expense => 'Edit Expense';
 
   @override
+  String get expenses_empty => 'Tap the + button to add first expense.';
+
+  @override
   String get add_savings => 'Add Savings';
 
   @override
   String get edit_savings => 'Edit Savings';
+
+  @override
+  String get total_savings => 'Total Savings';
+
+  @override
+  String get savings_empty => 'Tap the + button to add an account.';
 
   @override
   String get amount => 'Amount';
@@ -88,4 +100,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get note_hint => 'Optional';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get export_data => 'Export Data';
+
+  @override
+  String get import_data => 'Import Data';
+
+  @override
+  String get clear_db => 'Clear Database';
+
+  @override
+  String get clear_db_hint => 'Delete all transactions, savings and sources';
+
+  @override
+  String get income_src => 'Income Sources';
+
+  @override
+  String get income_src_hint => 'Manage income sources and categories';
+
+  @override
+  String get expense_src => 'Expense Categories';
+
+  @override
+  String get expense_src_hint => 'Manage expense categories';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get what_new => 'What\'s New';
 }

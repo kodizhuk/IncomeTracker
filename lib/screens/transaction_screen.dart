@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/transaction.dart';
@@ -231,6 +233,7 @@ class _InOutScreenState extends State<InOutScreen> {
   @override
   Widget build(BuildContext context) {
     final activeTransactions = _activeTransactions;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Padding(
@@ -282,8 +285,8 @@ class _InOutScreenState extends State<InOutScreen> {
                   activeTransactions.isEmpty
                       ? Text(
                           widget.type == 'income'
-                              ? 'No income transactions yet'
-                              : 'No expense transactions yet',
+                              ? l10n.income_empty
+                              : l10n.expenses_empty,
                           style: const TextStyle(
                             fontSize: 18,
                             color: Colors.grey,
