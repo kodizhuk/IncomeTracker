@@ -24,7 +24,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit_income => 'Edit Income';
 
   @override
-  String get income_empty => 'Tap the + button to add first income.';
+  String get income_empty => 'Tap the + to add first income.';
 
   @override
   String get add_expense => 'Add Expense';
@@ -33,7 +33,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit_expense => 'Edit Expense';
 
   @override
-  String get expenses_empty => 'Tap the + button to add first expense.';
+  String get expenses_empty => 'Tap the + to add first expense.';
 
   @override
   String get add_savings => 'Add Savings';
@@ -45,7 +45,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get total_savings => 'Total Savings';
 
   @override
-  String get savings_empty => 'Tap the + button to add an account.';
+  String get savings_empty => 'Tap the + to add an account.';
 
   @override
   String get amount => 'Amount';

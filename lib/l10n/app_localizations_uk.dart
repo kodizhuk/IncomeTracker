@@ -24,7 +24,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get edit_income => 'Редагувати прибуток';
 
   @override
-  String get income_empty => 'Нажміть кнопку +, щоб додати перший прибуток.';
+  String get income_empty => 'Нажміть +, щоб додати перший прибуток.';
 
   @override
   String get add_expense => 'Додати витрати';
@@ -33,7 +33,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get edit_expense => 'Редагувати витрати';
 
   @override
-  String get expenses_empty => 'Нажміть кнопку +, щоб додати перші витрати.';
+  String get expenses_empty => 'Нажміть +, щоб додати перші витрати.';
 
   @override
   String get add_savings => 'Додати заощадження';
@@ -45,7 +45,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get total_savings => 'Сума заощаджень';
 
   @override
-  String get savings_empty => 'Нажміть кнопку +, щоб додати аккаунт.';
+  String get savings_empty => 'Нажміть +, щоб додати аккаунт.';
 
   @override
   String get amount => 'Сума';

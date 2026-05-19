@@ -128,7 +128,7 @@ abstract class AppLocalizations {
   /// No description provided for @income_empty.
   ///
   /// In en, this message translates to:
-  /// **'Tap the + button to add first income.'**
+  /// **'Tap the + to add first income.'**
   String get income_empty;
 
   /// No description provided for @add_expense.
@@ -146,7 +146,7 @@ abstract class AppLocalizations {
   /// No description provided for @expenses_empty.
   ///
   /// In en, this message translates to:
-  /// **'Tap the + button to add first expense.'**
+  /// **'Tap the + to add first expense.'**
   String get expenses_empty;
 
   /// No description provided for @add_savings.
@@ -170,7 +170,7 @@ abstract class AppLocalizations {
   /// No description provided for @savings_empty.
   ///
   /// In en, this message translates to:
-  /// **'Tap the + button to add an account.'**
+  /// **'Tap the + to add an account.'**
   String get savings_empty;
 
   /// No description provided for @amount.

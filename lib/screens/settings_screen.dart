@@ -329,7 +329,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('What\'s New'),
+                        title: Text(l10n.what_new),
                         content: const SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
