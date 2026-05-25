@@ -136,4 +136,10 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get what_new => 'Що нового';
+
+  @override
+  String get theme => 'Тема';
+
+  @override
+  String get theme_hint => 'Перемикання між світлою та темною темами';
 }

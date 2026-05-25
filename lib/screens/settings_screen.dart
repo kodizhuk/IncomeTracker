@@ -110,15 +110,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: .start,
                             children: [
                               Text(
-                                'Theme',
+                                '${l10n.theme}:',
                                 style: theme.typography.xs.copyWith(
-                                  fontWeight: .w500,
                                   color: theme.colors.foreground,
-                                  height: 1.5,
+                                  fontSize: 16,
                                 ),
                               ),
                               Text(
-                                'Switch between light and dark themes',
+                                l10n.theme_hint,
                                 style: theme.typography.sm.copyWith(
                                   color: theme.colors.mutedForeground,
                                 ),

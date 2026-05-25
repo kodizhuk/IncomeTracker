@@ -136,4 +136,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get what_new => 'What\'s New';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get theme_hint => 'Switch between light and dark themes';
 }

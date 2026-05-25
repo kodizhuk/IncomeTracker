@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:intl/intl.dart';
 import '../models/savings_account.dart';
 
@@ -33,6 +34,10 @@ class SavingsAccountWidget extends StatelessWidget {
       decimalDigits: 0,
     );
 
+    final theme = FTheme.of(context);
+    final colors = theme.colors;
+    final text = theme.typography;
+
     return GestureDetector(
       onTap: onEdit, // ← Tap anywhere → Edit
       onLongPress: onDelete, // ← Long press → Delete (replaces menu)
@@ -40,6 +45,7 @@ class SavingsAccountWidget extends StatelessWidget {
         // ← Ripple effect on tap
         borderRadius: BorderRadius.circular(12), // Match Card radius
         child: Card(
+          color: theme.colors.border, // Use theme color
           margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           shape: RoundedRectangleBorder(
             // Rounded corners

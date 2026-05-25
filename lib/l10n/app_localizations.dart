@@ -352,6 +352,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'What\'s New'**
   String get what_new;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @theme_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between light and dark themes'**
+  String get theme_hint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

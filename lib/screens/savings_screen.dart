@@ -235,7 +235,6 @@ class _SavingsScreenState extends State<SavingsScreen> {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 255, 255, 255),
                       ),
                     ),
                   ),
@@ -269,6 +268,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                                   mainAxisSpacing: 2,
                                   crossAxisSpacing: 5,
                                   childAspectRatio: 1.6,
+                                  mainAxisExtent: 120,
                                 ),
                             itemCount: _savingsAccounts.length,
                             itemBuilder: (context, index) {

@@ -43,6 +43,8 @@
     "expense_src": "Expense Categories",
     "expense_src_hint": "Manage expense categories",
     "about": "About",
-    "what_new": "What's New"
+    "what_new": "What's New",
+    "theme": "Theme",
+    "theme_hint": "Switch between light and dark themes"
 
 }
