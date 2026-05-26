@@ -113,6 +113,12 @@ abstract class AppLocalizations {
   /// **'Savings'**
   String get savings;
 
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
   /// No description provided for @add_income.
   ///
   /// In en, this message translates to:
@@ -364,6 +370,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch between light and dark themes'**
   String get theme_hint;
+
+  /// No description provided for @month.
+  ///
+  /// In en, this message translates to:
+  /// **'Місяць'**
+  String get month;
+
+  /// No description provided for @year.
+  ///
+  /// In en, this message translates to:
+  /// **'Рік'**
+  String get year;
+
+  /// No description provided for @total_income.
+  ///
+  /// In en, this message translates to:
+  /// **'Загальний прибуток'**
+  String get total_income;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -18,6 +18,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get savings => 'Заощадження';
 
   @override
+  String get statistics => 'Статистика';
+
+  @override
   String get add_income => 'Додати прибуток';
 
   @override
@@ -142,4 +145,13 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get theme_hint => 'Перемикання між світлою та темною темами';
+
+  @override
+  String get month => 'Місяць';
+
+  @override
+  String get year => 'Рік';
+
+  @override
+  String get total_income => 'Загальний прибуток';
 }

@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:forui/forui.dart';
 import 'package:intl/intl.dart';
+import 'package:my_money/l10n/app_localizations.dart';
 import '../services/database_service.dart';
 import '../models/transaction.dart' as model;
-
 
 //Buttons to select time range for graphs
 enum TimeRange { month, year }
 
 class IncomeEntry {
   final DateTime date;
-  final double amount;      // Amount
-  final String category;    // "Salary", "Freelance", etc.
-  final Color color;        // Category color
+  final double amount; // Amount
+  final String category; // "Salary", "Freelance", etc.
+  final Color color; // Category color
 
   IncomeEntry({
     required this.date,
@@ -21,7 +22,6 @@ class IncomeEntry {
     required this.color,
   });
 }
-
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -41,13 +41,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   // methods for the current view
   DateTime _selectedDate = DateTime.now();
-  String _getDate(){
+  String _getDate() {
+    final locale = Localizations.localeOf(context).toLanguageTag();
     if (_range == TimeRange.month) {
-      return DateFormat('MMMM yyyy').format(_selectedDate);
+      return DateFormat('LLLL yyyy', locale).format(_selectedDate);
     } else {
-      return DateFormat('yyyy').format(_selectedDate);
+      return DateFormat('yyyy', locale).format(_selectedDate);
     }
   }
+
   void _nextDate() {
     if (_range == TimeRange.month) {
       _selectedDate = DateTime(_selectedDate.year, _selectedDate.month + 1);
@@ -56,6 +58,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     }
     setState(() {});
   }
+
   void _previousDate() {
     if (_range == TimeRange.month) {
       _selectedDate = DateTime(_selectedDate.year, _selectedDate.month - 1);
@@ -69,7 +72,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     double total = 0;
     for (final tx in _income) {
       if (_range == TimeRange.month) {
-        if (tx.date.year == _selectedDate.year && tx.date.month == _selectedDate.month) {
+        if (tx.date.year == _selectedDate.year &&
+            tx.date.month == _selectedDate.month) {
           currency == 'UAH' ? total += _toUAH(tx) : total += tx.amount_usd;
         }
       } else {
@@ -81,8 +85,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     }
 
     var formatter = NumberFormat('#,##,000');
-    String numberTotal = formatter.format(total).trim().replaceAll(',', ' ') ;
-    return '$numberTotal ' '$currency';
+    String numberTotal = formatter.format(total).trim().replaceAll(',', ' ');
+    return '$numberTotal '
+        '$currency';
   }
 
   @override
@@ -99,7 +104,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       final categories = await _db.getSources('income');
       setState(() {
         _income = tx;
-        _categories = categories.map((c) => {c['name'] as String: Color(int.parse(c['color'] as String, radix: 16))}).toList();
+        _categories = categories
+            .map(
+              (c) => {
+                c['name'] as String: Color(
+                  int.parse(c['color'] as String, radix: 16),
+                ),
+              },
+            )
+            .toList();
         _usdRate = rates['usd'] ?? _usdRate;
         _eurRate = rates['eur'] ?? _eurRate;
         _isLoading = false;
@@ -131,7 +144,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         _selectedDate.year,
         _selectedDate.month + 1,
         0,
-      ).day; // Gets last day number 
+      ).day; // Gets last day number
 
       // last 30 days grouped by day
       final days = List.generate(
@@ -154,10 +167,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       for (final tx in _income) {
         final key = DateFormat('yyyy-MM-dd').format(tx.date);
 
-        Color color = _categories.firstWhere(
-          (c) => c.containsKey(tx.source),
-          orElse: () => {'': Colors.green},
-        )[tx.source] ?? Colors.green;
+        Color color =
+            _categories.firstWhere(
+              (c) => c.containsKey(tx.source),
+              orElse: () => {'': Colors.green},
+            )[tx.source] ??
+            Colors.green;
 
         if (map.containsKey(key)) {
           map[key] = IncomeEntry(
@@ -169,15 +184,17 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         }
       }
       return map;
-
     } else if (_range == TimeRange.year) {
       // Current year months grouped by month
-      final months = List.generate(12, (i) => DateTime(_selectedDate.year, i + 1, 1));
+      final months = List.generate(
+        12,
+        (i) => DateTime(_selectedDate.year, i + 1, 1),
+      );
       final map = <String, IncomeEntry>{};
       for (final m in months) {
         map[DateFormat('yyyy-MM').format(m)] = IncomeEntry(
           date: m,
-          amount: 0.0 ,
+          amount: 0.0,
           category: '',
           color: Colors.transparent,
         );
@@ -186,10 +203,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         if (tx.date.year == _selectedDate.year) {
           final key = DateFormat('yyyy-MM').format(tx.date);
 
-          Color color = _categories.firstWhere(
-            (c) => c.containsKey(tx.source),
-            orElse: () => {'': Colors.green},
-          )[tx.source] ?? Colors.green;
+          Color color =
+              _categories.firstWhere(
+                (c) => c.containsKey(tx.source),
+                orElse: () => {'': Colors.green},
+              )[tx.source] ??
+              Colors.green;
 
           if (map.containsKey(key)) {
             map[key] = IncomeEntry(
@@ -207,12 +226,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       final map = <String, IncomeEntry>{};
       for (final tx in _income) {
         final key = tx.date.year.toString();
-        map[key] = (map[key] ?? IncomeEntry(
-          date: DateTime.parse(key),
-          amount: 0.0,
-          category: '',
-          color: Colors.transparent,
-        ));
+        map[key] =
+            (map[key] ??
+            IncomeEntry(
+              date: DateTime.parse(key),
+              amount: 0.0,
+              category: '',
+              color: Colors.transparent,
+            ));
       }
       return map;
     }
@@ -220,21 +241,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final data = _aggregate();
-    // final data = _aggregate();
     final data = _aggregate().entries
-      .map((e) => MapEntry(e.key, e.value.amount))
-      .toList();
-    
-    final colors = _aggregate().entries
-      .map((e) => e.value.color)
-      .toList();
+        .map((e) => MapEntry(e.key, e.value.amount))
+        .toList();
+
+    final colors = _aggregate().entries.map((e) => e.value.color).toList();
 
     final spots = <FlSpot>[];
-    List<Color> spotColors = []; 
+    List<Color> spotColors = [];
     for (var i = 0; i < data.length; i++) {
       spots.add(FlSpot(i.toDouble(), data[i].value));
-      spotColors.add(colors[i]); // Use category color or transparent for zero values
+      spotColors.add(
+        colors[i],
+      ); // Use category color or transparent for zero values
     }
 
     double maxY = 0;
@@ -243,9 +262,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     }
     double interval = maxY > 0 ? (maxY * 1.1) / 5 : 20;
 
+    final l10n = AppLocalizations.of(context)!;
+    final theme = FTheme.of(context);
+    final theme_colors = theme.colors;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Statistics'),
+        title: Text(l10n.statistics),
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _loadData),
         ],
@@ -253,7 +276,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       // TODO: add total Tithes calculation
       // TODO: filter by category
       // TODO: add graph/pie chart for income categories
-      // 
+      //
       //Buttons
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -267,12 +290,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       ChoiceChip(
-                        label: const Text('Month'),
+                        label: Text(l10n.month),
                         selected: _range == TimeRange.month,
                         onSelected: (_) => _setRange(TimeRange.month),
                       ),
                       ChoiceChip(
-                        label: const Text('Year'),
+                        label: Text(l10n.year),
                         selected: _range == TimeRange.year,
                         onSelected: (_) => _setRange(TimeRange.year),
                       ),
@@ -306,21 +329,22 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                     ],
                   ),
-                  
+
                   Text(
-                    'Income Total: ${_getTotal('UAH')} (${_getTotal('USD')})',
+                    '${l10n.total_income}: ${_getTotal('UAH')} (${_getTotal('USD')})',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  
+
                   SizedBox(
                     height: 300,
                     child: data.isEmpty
                         ? const Center(child: Text('No data'))
                         : BarChart(
                             BarChartData(
+                              backgroundColor: theme.colors.border,
                               minY: 0,
                               maxY: maxY > 0 ? maxY * 1.1 : 100,
                               gridData: FlGridData(show: false),
@@ -354,10 +378,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                       } else {
                                         display = label;
                                       }
-                                      //String display = DateFormat('dd').format(DateTime.parse(label));
 
                                       return SideTitleWidget(
-                                        // axisSide: meta.axisSide,
                                         meta: meta,
                                         child: Text(
                                           display,
@@ -383,21 +405,28 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                               ),
 
                               // show Bars
-                              // borderData: FlBorderData(show: false),
+                              // borderData: FlBorderData(show: true),
                               barTouchData: BarTouchData(
                                 enabled: true,
                                 touchTooltipData: BarTouchTooltipData(
-                                  getTooltipColor: (BarChartGroupData group) => Colors.transparent, 
+                                  getTooltipColor: (BarChartGroupData group) =>
+                                      Colors.transparent,
                                   tooltipPadding: EdgeInsets.zero,
                                   tooltipMargin: 0,
                                   tooltipBorderRadius: BorderRadius.zero,
-                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                    return BarTooltipItem(
-                                      //the actual value to show in tooltip 
-                                      rod.toY.toInt() > 1000 ? '${(rod.toY / 1000).toStringAsFixed(0)}k' : '${rod.toY.toInt()}',
-                                      const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                                    );
-                                  },
+                                  getTooltipItem:
+                                      (group, groupIndex, rod, rodIndex) {
+                                        return BarTooltipItem(
+                                          //the actual value to show in tooltip
+                                          rod.toY.toInt() > 1000
+                                              ? '${(rod.toY / 1000).toStringAsFixed(0)}k'
+                                              : '${rod.toY.toInt()}',
+                                          const TextStyle(
+                                            color: Colors.white,
+                                            // fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                      },
                                 ),
                               ),
                               barGroups: spots.asMap().entries.map((entry) {
@@ -405,7 +434,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 final index = entry.key;
                                 if (spot.y == 0) {
                                   // Show empty bar for zero values to keep spacing, but make it invisible
-                                  return BarChartGroupData(x: entry.key, barRods: []);  // Empty bars
+                                  return BarChartGroupData(
+                                    x: entry.key,
+                                    barRods: [],
+                                  ); // Empty bars
                                 }
                                 return BarChartGroupData(
                                   x: entry.key,
@@ -428,7 +460,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   ),
                 ],
               ),
-      ), 
+      ),
     );
   }
 }

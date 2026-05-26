@@ -3,6 +3,7 @@
     "income": "Income",
     "expenses": "Expenses",
     "savings": "Savings",
+    "statistics": "Statistics",
 
     "add_income": "Add Income",
     "edit_income": "Edit Income",
@@ -45,6 +46,9 @@
     "about": "About",
     "what_new": "What's New",
     "theme": "Theme",
-    "theme_hint": "Switch between light and dark themes"
+    "theme_hint": "Switch between light and dark themes",
+    "month": "Month",
+    "year": "Year",
+    "total_income": "Total Income"
 
 }
