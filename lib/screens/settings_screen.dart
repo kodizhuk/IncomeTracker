@@ -55,24 +55,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _saveRates() {
-    if (!_formKey.currentState!.validate()) return;
-    final currency = 'UAH';
-    final usdRate = double.tryParse(_usdController.text) ?? 42.0;
-    DatabaseService()
-        .setExchangeRates(currency, usdRate)
-        .then((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Saved rates — USD: $usdRate')),
-          );
-        })
-        .catchError((e) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error saving rates: $e')));
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
@@ -85,9 +67,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(icon: const Icon(Icons.save), onPressed: _saveRates),
-        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -98,33 +77,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
               mainAxisAlignment: .center,
               crossAxisAlignment: .start,
               children: [
-                const SizedBox(height: 15),
                 FItemGroup.merge(
-                  // style: const .delta(spacing: 4),
                   enabled: true,
-                  // intrinsicWidth: null,
-                  divider: .none,
+                  divider: .full,
                   children: [
                     .group(
                       children: [
-                        FItem(
+                        .item(
                           prefix: const Icon(Icons.palette),
                           title: Text(l10n.theme),
-                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          suffix: const Icon(Icons.arrow_forward_ios),
                           // subtitle: Text(l10n.theme_hint),
                           onPress: () {},
                         ),
-                        FItem(
+                        .item(
                           prefix: const Icon(Icons.language),
                           title: Text(l10n.language),
-                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          suffix: const Icon(Icons.arrow_forward_ios),
                           details: Text('English, Українська'),
                           onPress: () {},
                         ),
-                        FItem(
+                      ],
+                    ),
+
+                    .group(
+                      children: [
+                        .item(
                           prefix: const Icon(Icons.edit),
                           title: Text(l10n.income_src),
-                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          suffix: const Icon(Icons.arrow_forward_ios),
                           // details: Text(l10n.income_src_hint),
                           onPress: () {
                             Navigator.push(
@@ -135,10 +116,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             );
                           },
                         ),
-                        FItem(
+                        .item(
                           prefix: const Icon(Icons.edit),
                           title: Text(l10n.expense_src),
-                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          suffix: const Icon(Icons.arrow_forward_ios),
                           // details: Text(l10n.expense_src_hint),
                           onPress: () {
                             Navigator.push(
@@ -149,15 +130,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             );
                           },
                         ),
+                      ],
+                    ),
 
-                        FItem(
+                    .group(
+                      children: [
+                        .item(
                           prefix: const Icon(Icons.newspaper),
                           title: Text(l10n.what_new),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text('Version 0.0.1'),
                           onPress: () {},
                         ),
-                        FItem(
+                        .item(
                           prefix: const Icon(Icons.info),
                           title: Text(l10n.about),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -182,7 +167,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     .group(
                       // Import/export database
                       children: [
-                        FItem(
+                        .item(
                           prefix: const Icon(Icons.upload),
                           title: Text(l10n.export_data),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -211,7 +196,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             }
                           },
                         ),
-                        FItem(
+                        .item(
                           prefix: const Icon(Icons.download),
                           title: Text(l10n.import_data),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -250,7 +235,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             }
                           },
                         ),
-                        FItem(
+                        .item(
                           prefix: const Icon(Icons.delete),
                           title: Text(l10n.clear_db),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
