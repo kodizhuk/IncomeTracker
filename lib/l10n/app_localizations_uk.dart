@@ -111,10 +111,16 @@ class AppLocalizationsUk extends AppLocalizations {
   String get language => 'Мова';
 
   @override
-  String get export_data => 'Експот даних';
+  String get export_data => 'Експорт даних';
+
+  @override
+  String get to_csv => 'у CSV файл';
 
   @override
   String get import_data => 'Імпорт даних';
+
+  @override
+  String get from_csv => 'із CSV файла';
 
   @override
   String get clear_db => 'Очистити базу даних';
@@ -154,4 +160,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get total_income => 'Загальний прибуток';
+
+  @override
+  String get about_text => 'IncomeTracker це фінансовий додаток, який спрощує керування вашими доходами, витратами та довгостроковими заощадженнями в одному місці.\n\n\tВін має детальну візуальну статистику для розподілу доходів за категоріями та вбудований калькулятор, який автоматично визначає вашу церковну десятину.\n\n\tБез реклами, без відстеження, усі дані зберігаються в локальній базі даних на вашому пристрої.';
 }

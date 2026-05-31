@@ -99,260 +99,212 @@ class _SettingsScreenState extends State<SettingsScreen> {
               crossAxisAlignment: .start,
               children: [
                 const SizedBox(height: 15),
-                FCard.raw(
-                  child: Padding(
-                    padding: const .fromLTRB(16, 12, 16, 16),
-                    child: Row(
-                      mainAxisAlignment: .spaceBetween,
+                FItemGroup.merge(
+                  // style: const .delta(spacing: 4),
+                  enabled: true,
+                  // intrinsicWidth: null,
+                  divider: .none,
+                  children: [
+                    .group(
                       children: [
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: .start,
-                            children: [
-                              Text(
-                                '${l10n.theme}:',
-                                style: theme.typography.xs.copyWith(
-                                  color: theme.colors.foreground,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Text(
-                                l10n.theme_hint,
-                                style: theme.typography.sm.copyWith(
-                                  color: theme.colors.mutedForeground,
-                                ),
-                              ),
-                            ],
-                          ),
+                        FItem(
+                          prefix: const Icon(Icons.palette),
+                          title: Text(l10n.theme),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          // subtitle: Text(l10n.theme_hint),
+                          onPress: () {},
                         ),
-                        FormField(
-                          initialValue: false,
-                          onSaved: (value) {
-                            // Save values somewhere.
+                        FItem(
+                          prefix: const Icon(Icons.language),
+                          title: Text(l10n.language),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          details: Text('English, Українська'),
+                          onPress: () {},
+                        ),
+                        FItem(
+                          prefix: const Icon(Icons.edit),
+                          title: Text(l10n.income_src),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          // details: Text(l10n.income_src_hint),
+                          onPress: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const EditSourcesScreen(),
+                              ),
+                            );
                           },
-                          validator: (value) => null, // No validation required.
-                          builder: (state) => FSwitch(
-                            value: state.value ?? false,
-                            onChange: (value) => state.didChange(value),
-                          ),
+                        ),
+                        FItem(
+                          prefix: const Icon(Icons.edit),
+                          title: Text(l10n.expense_src),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          // details: Text(l10n.expense_src_hint),
+                          onPress: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const EditCategoriesScreen(),
+                              ),
+                            );
+                          },
+                        ),
+
+                        FItem(
+                          prefix: const Icon(Icons.newspaper),
+                          title: Text(l10n.what_new),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          details: Text('Version 0.0.1'),
+                          onPress: () {},
+                        ),
+                        FItem(
+                          prefix: const Icon(Icons.info),
+                          title: Text(l10n.about),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          // subtitle: Text('Money Tracker v0.0.1'),
+                          details: const Text('Money Tracker v0.0.1'),
+                          onPress: () {
+                            showAboutDialog(
+                              context: context,
+                              applicationName: 'Money Tracker',
+                              applicationVersion: '0.0.1',
+                              applicationLegalese: '© 2026 Money Tracker App',
+                              children: [
+                                const SizedBox(height: 16),
+                                Text(l10n.about_text),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 12),
 
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: Text(l10n.language),
-                  subtitle: const Text('English'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Language settings coming soon!'),
-                      ),
-                    );
-                  },
-                ),
-
-                const Divider(),
-
-                ListTile(
-                  leading: const Icon(Icons.download),
-                  title: Text(l10n.export_data),
-                  subtitle: Text('to CSV file'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () async {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Exporting database...')),
-                    );
-                    try {
-                      // final path = await DatabaseService().exportDatabase();
-                      final path = await DatabaseService().exportDBToCsv();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Database exported to $path')),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error exporting database: $e')),
-                      );
-                    }
-                  },
-                ),
-
-                const Divider(),
-
-                ListTile(
-                  leading: const Icon(Icons.upload),
-                  title: Text(l10n.import_data),
-                  subtitle: const Text('from CSV file'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () async {
-                    try {
-                      final result = await FilePicker.platform.pickFiles(
-                        allowMultiple: false,
-                        type: FileType.custom,
-                        allowedExtensions: ['csv'],
-                      );
-                      if (result == null || result.files.isEmpty) return;
-                      final path = result.files.single.path;
-                      if (path == null) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Importing CSV...')),
-                      );
-                      final file = File(path);
-                      final csvContent = await file.readAsString();
-                      await DatabaseService().importFromCsv(csvContent);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('CSV imported successfully'),
-                        ),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error importing CSV: $e')),
-                      );
-                    }
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: Text(l10n.clear_db),
-                  subtitle: Text(l10n.clear_db_hint),
-                  trailing: const Icon(Icons.warning, color: Colors.red),
-                  onTap: () async {
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(l10n.clear_db),
-                        content: const Text(
-                          'This will permanently delete all your transactions, savings accounts, and sources. This action cannot be undone. Are you sure?',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.red,
-                            ),
-                            child: const Text('Clear'),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (confirmed == true) {
-                      try {
-                        await DatabaseService().clearDatabase();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Database cleared successfully'),
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error clearing database: $e'),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                ),
-
-                const Divider(),
-
-                ListTile(
-                  leading: const Icon(Icons.edit),
-                  title: Text(l10n.income_src),
-                  subtitle: Text(l10n.income_src_hint),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const EditSourcesScreen(),
-                      ),
-                    );
-                  },
-                ),
-
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.edit),
-                  title: Text(l10n.expense_src),
-                  subtitle: Text(l10n.expense_src_hint),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const EditCategoriesScreen(),
-                      ),
-                    );
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.info),
-                  title: Text(l10n.about),
-                  subtitle: const Text('Money Tracker v0.0.1'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    showAboutDialog(
-                      context: context,
-                      applicationName: 'Money Tracker',
-                      applicationVersion: '0.0.1',
-                      applicationLegalese: '© 2026 Money Tracker App',
+                    .group(
+                      // Import/export database
                       children: [
-                        const SizedBox(height: 16),
-                        const Text(
-                          '\tIncomeTracker is a financial tracker that simplifies managing your income, expenses, and long-term savings in one place.\n \tIt features detailed visual statistics to break down earnings by category and includes a built-in calculator to automatically determine your church tithe.\n \t No AD, no tracking, all data are saved in local database on your device.',
-                          textAlign: TextAlign.left,
+                        FItem(
+                          prefix: const Icon(Icons.upload),
+                          title: Text(l10n.export_data),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          details: Text(l10n.to_csv),
+                          onPress: () async {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Exporting database...'),
+                              ),
+                            );
+                            try {
+                              // final path = await DatabaseService().exportDatabase();
+                              final path = await DatabaseService()
+                                  .exportDBToCsv();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Database exported to $path'),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error exporting database: $e'),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        FItem(
+                          prefix: const Icon(Icons.download),
+                          title: Text(l10n.import_data),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          details: Text(l10n.from_csv),
+                          onPress: () async {
+                            try {
+                              final result = await FilePicker.platform
+                                  .pickFiles(
+                                    allowMultiple: false,
+                                    type: FileType.custom,
+                                    allowedExtensions: ['csv'],
+                                  );
+                              if (result == null || result.files.isEmpty)
+                                return;
+                              final path = result.files.single.path;
+                              if (path == null) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Importing CSV...'),
+                                ),
+                              );
+                              final file = File(path);
+                              final csvContent = await file.readAsString();
+                              await DatabaseService().importFromCsv(csvContent);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('CSV imported successfully'),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error importing CSV: $e'),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        FItem(
+                          prefix: const Icon(Icons.delete),
+                          title: Text(l10n.clear_db),
+                          suffix: const Icon(Icons.arrow_forward_ios, size: 16),
+                          details: Text(l10n.clear_db_hint),
+                          onPress: () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text(l10n.clear_db),
+                                content: const Text(
+                                  'This will permanently delete all your transactions, savings accounts, and sources. This action cannot be undone. Are you sure?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                    ),
+                                    child: const Text('Clear'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirmed == true) {
+                              try {
+                                await DatabaseService().clearDatabase();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Database cleared successfully',
+                                    ),
+                                  ),
+                                );
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Error clearing database: $e',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          },
                         ),
                       ],
-                    );
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.new_releases),
-                  title: Text(l10n.what_new),
-                  subtitle: const Text('Version 0.0.1'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(l10n.what_new),
-                        content: const SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Version 1.0.0',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 8),
-                              Text('• TBD'),
-                              Text('• TBD'),
-                            ],
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Close'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ],
             ),

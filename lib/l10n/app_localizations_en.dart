@@ -114,7 +114,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get export_data => 'Export Data';
 
   @override
+  String get to_csv => 'to CSV file';
+
+  @override
   String get import_data => 'Import Data';
+
+  @override
+  String get from_csv => 'from CSV file';
 
   @override
   String get clear_db => 'Clear Database';
@@ -147,11 +153,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get theme_hint => 'Switch between light and dark themes';
 
   @override
-  String get month => 'Місяць';
+  String get month => 'Month';
 
   @override
-  String get year => 'Рік';
+  String get year => 'Year';
 
   @override
-  String get total_income => 'Загальний прибуток';
+  String get total_income => 'Total Income';
+
+  @override
+  String get about_text => '\tIncomeTracker is a financial app that simplifies managing your income, expenses, and long-term savings in one place.\n\n\tIt features detailed visual statistics to break down earnings by category and includes a built-in calculator to automatically determine your church tithe.\n\n\t No AD, no tracking, all data are saved in local database on your device.';
 }

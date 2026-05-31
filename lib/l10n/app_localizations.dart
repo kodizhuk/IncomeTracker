@@ -305,11 +305,23 @@ abstract class AppLocalizations {
   /// **'Export Data'**
   String get export_data;
 
+  /// No description provided for @to_csv.
+  ///
+  /// In en, this message translates to:
+  /// **'to CSV file'**
+  String get to_csv;
+
   /// No description provided for @import_data.
   ///
   /// In en, this message translates to:
   /// **'Import Data'**
   String get import_data;
+
+  /// No description provided for @from_csv.
+  ///
+  /// In en, this message translates to:
+  /// **'from CSV file'**
+  String get from_csv;
 
   /// No description provided for @clear_db.
   ///
@@ -374,20 +386,26 @@ abstract class AppLocalizations {
   /// No description provided for @month.
   ///
   /// In en, this message translates to:
-  /// **'Місяць'**
+  /// **'Month'**
   String get month;
 
   /// No description provided for @year.
   ///
   /// In en, this message translates to:
-  /// **'Рік'**
+  /// **'Year'**
   String get year;
 
   /// No description provided for @total_income.
   ///
   /// In en, this message translates to:
-  /// **'Загальний прибуток'**
+  /// **'Total Income'**
   String get total_income;
+
+  /// No description provided for @about_text.
+  ///
+  /// In en, this message translates to:
+  /// **'\tIncomeTracker is a financial app that simplifies managing your income, expenses, and long-term savings in one place.\n\n\tIt features detailed visual statistics to break down earnings by category and includes a built-in calculator to automatically determine your church tithe.\n\n\t No AD, no tracking, all data are saved in local database on your device.'**
+  String get about_text;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

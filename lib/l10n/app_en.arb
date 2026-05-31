@@ -36,7 +36,9 @@
     "settings": "Settings",
     "language": "Language",
     "export_data": "Export Data",
+    "to_csv": "to CSV file",
     "import_data": "Import Data",
+    "from_csv": "from CSV file",
     "clear_db": "Clear Database",
     "clear_db_hint":"Delete all transactions, savings and sources",
     "income_src": "Income Sources",
@@ -49,6 +51,7 @@
     "theme_hint": "Switch between light and dark themes",
     "month": "Month",
     "year": "Year",
-    "total_income": "Total Income"
+    "total_income": "Total Income",
+    "about_text": "\tIncomeTracker is a financial app that simplifies managing your income, expenses, and long-term savings in one place.\n\n\tIt features detailed visual statistics to break down earnings by category and includes a built-in calculator to automatically determine your church tithe.\n\n\t No AD, no tracking, all data are saved in local database on your device."
 
 }
