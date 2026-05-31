@@ -55,6 +55,114 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  void _editTheme() {}
+  void _editLanguage() {}
+
+  void _editIncomeSources() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EditSourcesScreen()),
+    );
+  }
+
+  void _editExpenseSources() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EditCategoriesScreen()),
+    );
+  }
+
+  void _openUpdates() {}
+  void _openAbout() {
+    final l10n = AppLocalizations.of(context)!;
+    showAboutDialog(
+      context: context,
+      applicationName: 'Money Tracker',
+      applicationVersion: '0.0.1',
+      applicationLegalese: '© 2026 Money Tracker App',
+      children: [const SizedBox(height: 16), Text(l10n.about_text)],
+    );
+  }
+
+  void _exportData() async {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Exporting database...')));
+    try {
+      // final path = await DatabaseService().exportDatabase();
+      final path = await DatabaseService().exportDBToCsv();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Database exported to $path')));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error exporting database: $e')));
+    }
+  }
+
+  void _importData() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
+      if (result == null || result.files.isEmpty) return;
+      final path = result.files.single.path;
+      if (path == null) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Importing CSV...')));
+      final file = File(path);
+      final csvContent = await file.readAsString();
+      await DatabaseService().importFromCsv(csvContent);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('CSV imported successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error importing CSV: $e')));
+    }
+  }
+
+  void _clearDatabase() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.clear_db),
+        content: const Text(
+          'This will permanently delete all your transactions, savings accounts, and sources. This action cannot be undone. Are you sure?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      try {
+        await DatabaseService().clearDatabase();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Database cleared successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error clearing database: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = FTheme.of(context);
@@ -82,25 +190,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   divider: .full,
                   children: [
                     .group(
+                      // Theme and language
                       children: [
                         .item(
                           prefix: const Icon(Icons.palette),
                           title: Text(l10n.theme),
                           suffix: const Icon(Icons.arrow_forward_ios),
                           // subtitle: Text(l10n.theme_hint),
-                          onPress: () {},
+                          onPress: () {
+                            _editTheme();
+                          },
                         ),
                         .item(
                           prefix: const Icon(Icons.language),
                           title: Text(l10n.language),
                           suffix: const Icon(Icons.arrow_forward_ios),
                           details: Text('English, Українська'),
-                          onPress: () {},
+                          onPress: () {
+                            _editLanguage();
+                          },
                         ),
                       ],
                     ),
 
                     .group(
+                      // Income/expense sources and categories
                       children: [
                         .item(
                           prefix: const Icon(Icons.edit),
@@ -108,12 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           suffix: const Icon(Icons.arrow_forward_ios),
                           // details: Text(l10n.income_src_hint),
                           onPress: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const EditSourcesScreen(),
-                              ),
-                            );
+                            _editIncomeSources();
                           },
                         ),
                         .item(
@@ -122,25 +231,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           suffix: const Icon(Icons.arrow_forward_ios),
                           // details: Text(l10n.expense_src_hint),
                           onPress: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const EditCategoriesScreen(),
-                              ),
-                            );
+                            _editExpenseSources();
                           },
                         ),
                       ],
                     ),
 
                     .group(
+                      // Updates, about
                       children: [
                         .item(
                           prefix: const Icon(Icons.newspaper),
                           title: Text(l10n.what_new),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text('Version 0.0.1'),
-                          onPress: () {},
+                          onPress: () {
+                            _openUpdates();
+                          },
                         ),
                         .item(
                           prefix: const Icon(Icons.info),
@@ -149,23 +256,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           // subtitle: Text('Money Tracker v0.0.1'),
                           details: const Text('Money Tracker v0.0.1'),
                           onPress: () {
-                            showAboutDialog(
-                              context: context,
-                              applicationName: 'Money Tracker',
-                              applicationVersion: '0.0.1',
-                              applicationLegalese: '© 2026 Money Tracker App',
-                              children: [
-                                const SizedBox(height: 16),
-                                Text(l10n.about_text),
-                              ],
-                            );
+                            _openAbout();
                           },
                         ),
                       ],
                     ),
 
                     .group(
-                      // Import/export database
+                      // Import/export/clear database
                       children: [
                         .item(
                           prefix: const Icon(Icons.upload),
@@ -173,27 +271,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text(l10n.to_csv),
                           onPress: () async {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Exporting database...'),
-                              ),
-                            );
-                            try {
-                              // final path = await DatabaseService().exportDatabase();
-                              final path = await DatabaseService()
-                                  .exportDBToCsv();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Database exported to $path'),
-                                ),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Error exporting database: $e'),
-                                ),
-                              );
-                            }
+                            _exportData();
                           },
                         ),
                         .item(
@@ -202,37 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text(l10n.from_csv),
                           onPress: () async {
-                            try {
-                              final result = await FilePicker.platform
-                                  .pickFiles(
-                                    allowMultiple: false,
-                                    type: FileType.custom,
-                                    allowedExtensions: ['csv'],
-                                  );
-                              if (result == null || result.files.isEmpty)
-                                return;
-                              final path = result.files.single.path;
-                              if (path == null) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Importing CSV...'),
-                                ),
-                              );
-                              final file = File(path);
-                              final csvContent = await file.readAsString();
-                              await DatabaseService().importFromCsv(csvContent);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('CSV imported successfully'),
-                                ),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Error importing CSV: $e'),
-                                ),
-                              );
-                            }
+                            _importData();
                           },
                         ),
                         .item(
@@ -241,50 +289,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text(l10n.clear_db_hint),
                           onPress: () async {
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text(l10n.clear_db),
-                                content: const Text(
-                                  'This will permanently delete all your transactions, savings accounts, and sources. This action cannot be undone. Are you sure?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, false),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, true),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Colors.red,
-                                    ),
-                                    child: const Text('Clear'),
-                                  ),
-                                ],
-                              ),
-                            );
-                            if (confirmed == true) {
-                              try {
-                                await DatabaseService().clearDatabase();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Database cleared successfully',
-                                    ),
-                                  ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Error clearing database: $e',
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
+                            _clearDatabase();
                           },
                         ),
                       ],
