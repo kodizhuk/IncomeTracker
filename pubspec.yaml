@@ -58,6 +58,7 @@ dependencies:
   forui: ^0.17.0  # or any <0.18.0 that works
   shared_preferences: ^2.2.2
   provider: ^6.1.1
+  graphic: ^2.7.0
 
 
 dev_dependencies:

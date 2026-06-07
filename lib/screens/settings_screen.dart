@@ -8,6 +8,8 @@ import '../l10n/app_localizations.dart';
 
 import 'package:forui/forui.dart';
 
+enum AppLanguage { english, ukrainian }
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -56,7 +58,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _editTheme() {}
-  void _editLanguage() {}
+  void _editLanguage() {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = FTheme.of(context);
+
+    showFDialog(
+      context: context,
+      builder: (context, style, animation) => FTheme(
+        data: theme,
+        child: FDialog(
+          // style: style.copyWith(FButtonStyle.: 280, maxWidth: 420),
+          animation: animation,
+          direction: .horizontal,
+          title: Text(l10n.language),
+          body: FSelectGroup<AppLanguage>(
+            // controller: controller,
+            control: const .managedRadio(),
+            // label: const Text('Notifications'),
+            // description: const Text('Select the notifications.'),
+            validator: (values) =>
+                values?.isEmpty ?? true ? 'Please select a value.' : null,
+
+            children: [
+              .radio(value: AppLanguage.english, label: const Text('English')),
+              .radio(
+                value: AppLanguage.ukrainian,
+                label: const Text('Українська'),
+              ),
+            ],
+          ),
+          actions: [
+            FButton(
+              // style: FButtonStyle.outline(),
+              child: const Text('Ok'),
+              onPress: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _editIncomeSources() {
     Navigator.push(
@@ -72,15 +113,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _openUpdates() {}
+  void _openUpdates() {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = FTheme.of(context);
+
+    showFDialog(
+      context: context,
+      builder: (context, style, animation) => FTheme(
+        data: theme,
+        child: FDialog(
+          style: style,
+          animation: animation,
+          direction: .horizontal,
+          title: Text(l10n.what_new),
+          body: Text(
+            'Versoin 0.0.1\n- Initial release with basic features for tracking income, expenses, and savings.',
+          ),
+          actions: [
+            FButton(
+              // style: FButtonStyle.outline(),
+              child: const Text('Ok'),
+              onPress: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _openAbout() {
     final l10n = AppLocalizations.of(context)!;
-    showAboutDialog(
+    final theme = FTheme.of(context);
+
+    showFDialog(
       context: context,
-      applicationName: 'Money Tracker',
-      applicationVersion: '0.0.1',
-      applicationLegalese: '© 2026 Money Tracker App',
-      children: [const SizedBox(height: 16), Text(l10n.about_text)],
+      builder: (context, style, animation) => FTheme(
+        data: theme,
+        child: FDialog(
+          style: style,
+          animation: animation,
+          direction: .horizontal,
+          title: const Text('Money Tracker'),
+          body: Text(l10n.about_text),
+          actions: [
+            FButton(
+              // style: FButtonStyle.outline(),
+              child: const Text('Ok'),
+              onPress: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -193,8 +276,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Theme and language
                       children: [
                         .item(
-                          prefix: const Icon(Icons.palette),
-                          title: Text(l10n.theme),
+                          prefix: const Icon(Icons.palette, size: 20),
+                          title: Text(l10n.theme, style: theme.typography.xl),
                           suffix: const Icon(Icons.arrow_forward_ios),
                           // subtitle: Text(l10n.theme_hint),
                           onPress: () {
@@ -202,8 +285,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           },
                         ),
                         .item(
-                          prefix: const Icon(Icons.language),
-                          title: Text(l10n.language),
+                          prefix: const Icon(Icons.language, size: 20),
+                          title: Text(
+                            l10n.language,
+                            style: theme.typography.xl,
+                          ),
                           suffix: const Icon(Icons.arrow_forward_ios),
                           details: Text('English, Українська'),
                           onPress: () {
@@ -217,8 +303,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Income/expense sources and categories
                       children: [
                         .item(
-                          prefix: const Icon(Icons.edit),
-                          title: Text(l10n.income_src),
+                          prefix: const Icon(Icons.edit, size: 20),
+                          title: Text(
+                            l10n.income_src,
+                            style: theme.typography.xl,
+                          ),
                           suffix: const Icon(Icons.arrow_forward_ios),
                           // details: Text(l10n.income_src_hint),
                           onPress: () {
@@ -226,8 +315,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           },
                         ),
                         .item(
-                          prefix: const Icon(Icons.edit),
-                          title: Text(l10n.expense_src),
+                          prefix: const Icon(Icons.edit, size: 20),
+                          title: Text(
+                            l10n.expense_src,
+                            style: theme.typography.xl,
+                          ),
                           suffix: const Icon(Icons.arrow_forward_ios),
                           // details: Text(l10n.expense_src_hint),
                           onPress: () {
@@ -241,8 +333,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Updates, about
                       children: [
                         .item(
-                          prefix: const Icon(Icons.newspaper),
-                          title: Text(l10n.what_new),
+                          prefix: const Icon(Icons.newspaper, size: 20),
+                          title: Text(
+                            l10n.what_new,
+                            style: theme.typography.xl,
+                          ),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text('Version 0.0.1'),
                           onPress: () {
@@ -250,8 +345,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           },
                         ),
                         .item(
-                          prefix: const Icon(Icons.info),
-                          title: Text(l10n.about),
+                          prefix: const Icon(Icons.info, size: 20),
+                          title: Text(l10n.about, style: theme.typography.xl),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           // subtitle: Text('Money Tracker v0.0.1'),
                           details: const Text('Money Tracker v0.0.1'),
@@ -266,8 +361,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Import/export/clear database
                       children: [
                         .item(
-                          prefix: const Icon(Icons.upload),
-                          title: Text(l10n.export_data),
+                          prefix: const Icon(Icons.upload, size: 20),
+                          title: Text(
+                            l10n.export_data,
+                            style: theme.typography.xl,
+                          ),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text(l10n.to_csv),
                           onPress: () async {
@@ -275,8 +373,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           },
                         ),
                         .item(
-                          prefix: const Icon(Icons.download),
-                          title: Text(l10n.import_data),
+                          prefix: const Icon(Icons.download, size: 20),
+                          title: Text(
+                            l10n.import_data,
+                            style: theme.typography.xl,
+                          ),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text(l10n.from_csv),
                           onPress: () async {
@@ -284,8 +385,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           },
                         ),
                         .item(
-                          prefix: const Icon(Icons.delete),
-                          title: Text(l10n.clear_db),
+                          prefix: const Icon(Icons.delete, size: 20),
+                          title: Text(
+                            l10n.clear_db,
+                            style: theme.typography.xl,
+                          ),
                           suffix: const Icon(Icons.arrow_forward_ios, size: 16),
                           details: Text(l10n.clear_db_hint),
                           onPress: () async {

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:my_money/l10n/app_localizations.dart';
 import '../services/database_service.dart';
 import '../models/transaction.dart' as model;
+import 'package:graphic/graphic.dart';
 
 //Buttons to select time range for graphs
 enum TimeRange { month, year }
@@ -136,7 +137,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return tx.amount;
   }
 
-  // Returns list of (label, value) pairs ordered by time
+  // Returns list of (type, date, value, value) pairs ordered by time
+  // {"type": "Income", "index": 0, "value": 1000}
   Map<String, IncomeEntry> _aggregate() {
     if (_range == TimeRange.month) {
       // get the numbers of days to display based on current month
@@ -167,19 +169,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       for (final tx in _income) {
         final key = DateFormat('yyyy-MM-dd').format(tx.date);
 
-        Color color =
-            _categories.firstWhere(
-              (c) => c.containsKey(tx.source),
-              orElse: () => {'': Colors.green},
-            )[tx.source] ??
-            Colors.green;
-
         if (map.containsKey(key)) {
           map[key] = IncomeEntry(
             date: map[key]!.date,
             amount: map[key]!.amount + _toUAH(tx),
             category: map[key]!.category,
-            color: color,
+            color: Colors.white,
           );
         }
       }
@@ -203,19 +198,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         if (tx.date.year == _selectedDate.year) {
           final key = DateFormat('yyyy-MM').format(tx.date);
 
-          Color color =
-              _categories.firstWhere(
-                (c) => c.containsKey(tx.source),
-                orElse: () => {'': Colors.green},
-              )[tx.source] ??
-              Colors.green;
-
           if (map.containsKey(key)) {
             map[key] = IncomeEntry(
               date: map[key]!.date,
               amount: map[key]!.amount + _toUAH(tx),
               category: map[key]!.category,
-              color: color,
+              color: Colors.white,
             );
           }
         }
@@ -245,26 +233,17 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         .map((e) => MapEntry(e.key, e.value.amount))
         .toList();
 
-    final colors = _aggregate().entries.map((e) => e.value.color).toList();
-
-    final spots = <FlSpot>[];
-    List<Color> spotColors = [];
-    for (var i = 0; i < data.length; i++) {
-      spots.add(FlSpot(i.toDouble(), data[i].value));
-      spotColors.add(
-        colors[i],
-      ); // Use category color or transparent for zero values
-    }
-
-    double maxY = 0;
-    for (var spot in spots) {
-      if (spot.y > maxY) maxY = spot.y;
-    }
-    double interval = maxY > 0 ? (maxY * 1.1) / 5 : 20;
+    double maxY = data.isEmpty
+        ? 0
+        : data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
 
     final l10n = AppLocalizations.of(context)!;
     final theme = FTheme.of(context);
     final theme_colors = theme.colors;
+
+    final graphData = data.asMap().entries.map((entry) {
+      return {'type': 'Income', 'index': entry.key, 'value': entry.value.value};
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -338,125 +317,56 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     ),
                   ),
 
-                  SizedBox(
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    width: 350,
                     height: 300,
-                    child: data.isEmpty
-                        ? const Center(child: Text('No data'))
-                        : BarChart(
-                            BarChartData(
-                              backgroundColor: theme.colors.border,
-                              minY: 0,
-                              maxY: maxY > 0 ? maxY * 1.1 : 100,
-                              gridData: FlGridData(show: false),
-                              titlesData: FlTitlesData(
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 50,
-                                    interval: 1,
-                                    getTitlesWidget: (value, meta) {
-                                      final idx = value.toInt();
-                                      if (idx < 0 || idx >= data.length) {
-                                        return const SizedBox.shrink();
-                                      }
-                                      final entry = data[idx];
-                                      final valueY = entry.value;
-                                      if (valueY == 0) {
-                                        return const SizedBox.shrink(); // Hide zero
-                                      }
-                                      final label = entry.key;
-
-                                      String display;
-                                      if (_range == TimeRange.month) {
-                                        display = DateFormat(
-                                          'dd',
-                                        ).format(DateTime.parse(label));
-                                      } else if (_range == TimeRange.year) {
-                                        display = DateFormat(
-                                          'MMM',
-                                        ).format(DateTime.parse('$label-01'));
-                                      } else {
-                                        display = label;
-                                      }
-
-                                      return SideTitleWidget(
-                                        meta: meta,
-                                        child: Text(
-                                          display,
-                                          style: const TextStyle(fontSize: 10),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: false,
-                                    reservedSize: 50,
-                                    interval: interval,
-                                  ),
-                                ),
-                                rightTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false),
-                                ),
-                                topTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: false),
-                                ),
+                    child: Chart(
+                      data: graphData,
+                      variables: {
+                        'index': Variable(
+                          accessor: (Map map) => map['index'].toString(),
+                        ),
+                        'type': Variable(
+                          accessor: (Map map) => map['type'] as String,
+                        ),
+                        'value': Variable(
+                          accessor: (Map map) => (map['value'] as num).toInt(),
+                          scale: LinearScale(min: 0, max: maxY * 1.2),
+                        ),
+                      },
+                      marks: [
+                        IntervalMark(
+                          position:
+                              Varset('index') *
+                              Varset('value') /
+                              Varset('type'),
+                          shape: ShapeEncode(
+                            value: RectShape(labelPosition: 1),
+                          ),
+                          color: ColorEncode(
+                            variable: 'type',
+                            values: Defaults.colors10,
+                          ),
+                          label: LabelEncode(
+                            encoder: (tuple) => Label(
+                              tuple['value'].toString(),
+                              LabelStyle(
+                                textStyle: const TextStyle(fontSize: 10),
                               ),
-
-                              // show Bars
-                              // borderData: FlBorderData(show: true),
-                              barTouchData: BarTouchData(
-                                enabled: true,
-                                touchTooltipData: BarTouchTooltipData(
-                                  getTooltipColor: (BarChartGroupData group) =>
-                                      Colors.transparent,
-                                  tooltipPadding: EdgeInsets.zero,
-                                  tooltipMargin: 0,
-                                  tooltipBorderRadius: BorderRadius.zero,
-                                  getTooltipItem:
-                                      (group, groupIndex, rod, rodIndex) {
-                                        return BarTooltipItem(
-                                          //the actual value to show in tooltip
-                                          rod.toY.toInt() > 1000
-                                              ? '${(rod.toY / 1000).toStringAsFixed(0)}k'
-                                              : '${rod.toY.toInt()}',
-                                          const TextStyle(
-                                            color: Colors.white,
-                                            // fontWeight: FontWeight.bold,
-                                          ),
-                                        );
-                                      },
-                                ),
-                              ),
-                              barGroups: spots.asMap().entries.map((entry) {
-                                final spot = entry.value;
-                                final index = entry.key;
-                                if (spot.y == 0) {
-                                  // Show empty bar for zero values to keep spacing, but make it invisible
-                                  return BarChartGroupData(
-                                    x: entry.key,
-                                    barRods: [],
-                                  ); // Empty bars
-                                }
-                                return BarChartGroupData(
-                                  x: entry.key,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: spot.y,
-                                      color: spotColors[index],
-                                      width: 20,
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(4),
-                                      ),
-                                    ),
-                                  ],
-
-                                  showingTooltipIndicators: [0],
-                                );
-                              }).toList(),
                             ),
                           ),
+                          modifiers: [StackModifier()],
+                        ),
+                      ],
+                      coord: RectCoord(
+                        horizontalRangeUpdater: Defaults.horizontalRangeEvent,
+                      ),
+                      axes: [Defaults.horizontalAxis, Defaults.verticalAxis],
+                      selections: {'tap': PointSelection(variable: 'index')},
+                      tooltip: TooltipGuide(multiTuples: true),
+                      // crosshair: CrosshairGuide(),
+                    ),
                   ),
                 ],
               ),
