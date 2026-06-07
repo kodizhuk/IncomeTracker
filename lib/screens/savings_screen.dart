@@ -10,6 +10,10 @@ import 'settings_screen.dart';
 import 'statistics_screen.dart';
 import '../l10n/app_localizations.dart';
 
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 class SavingsScreen extends StatefulWidget {
   final ValueNotifier<int>? navIndexNotifier;
   const SavingsScreen({super.key, this.navIndexNotifier});
@@ -24,6 +28,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
 
   bool _isLoading = true;
   String _selectedCurrency = 'All';
+  String _ratesText = 'Loading...';
   double _settingsUsdRate = 42.0;
   double _settingsEurRate = 51.0;
 
@@ -31,6 +36,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
   void initState() {
     super.initState();
     _loadSavingsAccounts();
+    _loadRates();
     widget.navIndexNotifier?.addListener(_onNavIndexChanged);
   }
 
@@ -176,6 +182,31 @@ class _SavingsScreenState extends State<SavingsScreen> {
     });
   }
 
+  Future<void> _loadRates() async {
+    final response = await http.get(
+      Uri.parse(
+        'https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=5',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+
+      final usd = data.firstWhere((item) => item['ccy'] == 'USD');
+      final eur = data.firstWhere((item) => item['ccy'] == 'EUR');
+      final usdSale = double.parse(usd['sale']).toStringAsFixed(2);
+      final eurSale = double.parse(eur['sale']).toStringAsFixed(2);
+
+      setState(() {
+        _ratesText = 'USD: $usdSale \nEUR: $eurSale';
+      });
+    } else {
+      setState(() {
+        _ratesText = 'Failed to load rates';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -226,6 +257,17 @@ class _SavingsScreenState extends State<SavingsScreen> {
                         }),
                       ),
                     ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _ratesText,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -306,7 +348,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
       default:
         currencySymbol = r'$';
     }
-    var formatter = NumberFormat('#,##,000');
+    var formatter = NumberFormat('###,000');
     String numberTotal = formatter
         .format(_totalSavings)
         .trim()
