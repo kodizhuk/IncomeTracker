@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_money/services/exchange_rates.dart';
+import 'package:provider/provider.dart';
 import '../models/transaction.dart';
 import '../services/database_service.dart';
 import '../widgets/transaction_item.dart';
@@ -27,8 +29,6 @@ class _InOutScreenState extends State<InOutScreen> {
   List<Transaction> _allIncomeTransactions = [];
   List<Transaction> _expenseTransactions = [];
   bool _isLoading = true;
-  double _settingsUsdRate = 42.0;
-  double _settingsEurRate = 51.0;
   bool _showAllTime = false;
 
   final List<String> incomeCategoriesDefault = [
@@ -107,6 +107,9 @@ class _InOutScreenState extends State<InOutScreen> {
   }
 
   Future<void> _loadTransactions() async {
+    final rates = Provider.of<ExchangeRates>(context, listen: false);
+    double _usdRate = rates.usd;
+    double _eurRate = rates.eur;
     setState(() => _isLoading = true);
     try {
       final transactions = await _dbService.getTransactions('income');
@@ -124,8 +127,8 @@ class _InOutScreenState extends State<InOutScreen> {
         }
         _allIncomeTransactions = transactions;
         _expenseTransactions = expenses;
-        _settingsUsdRate = rates['usd'] ?? _settingsUsdRate;
-        _settingsEurRate = rates['eur'] ?? _settingsEurRate;
+        _usdRate = rates['usd'] ?? _usdRate;
+        _eurRate = rates['eur'] ?? _eurRate;
         _isLoading = false;
       });
     } catch (e) {
@@ -234,6 +237,7 @@ class _InOutScreenState extends State<InOutScreen> {
   Widget build(BuildContext context) {
     final activeTransactions = _activeTransactions;
     final l10n = AppLocalizations.of(context)!;
+    final rates = Provider.of<ExchangeRates>(context, listen: false);
 
     return Scaffold(
       body: Padding(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:intl/intl.dart';
 import '../models/savings_account.dart';
+import '../services/exchange_rates.dart';
+import 'package:provider/provider.dart';
 
 class SavingsAccountWidget extends StatelessWidget {
   final SavingsAccount account;
@@ -17,6 +19,8 @@ class SavingsAccountWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rates = Provider.of<ExchangeRates>(context, listen: false);
+
     String symbol;
     switch (account.currency) {
       case 'USD':
@@ -87,11 +91,30 @@ class SavingsAccountWidget extends StatelessWidget {
                   DateFormat.yMMMd().format(account.lastUpdated),
                   style: TextStyle(color: Colors.grey[500]),
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  _formatUSD(rates),
+                  style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  String _formatUSD(ExchangeRates rates) {
+    final fmt = NumberFormat('#,##0');
+    switch (account.currency) {
+      case 'EUR':
+        final value = account.amount * (rates.eur / rates.usd);
+        return '${fmt.format(value.round())} USD';
+      case 'UAH':
+        final value = account.amount / rates.usd;
+        return '${fmt.format(value.round())} USD';
+      default:
+        return '';
+    }
   }
 }
