@@ -3,6 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:forui/forui.dart';
 import 'package:intl/intl.dart';
 import 'package:my_money/l10n/app_localizations.dart';
+import 'package:my_money/services/exchange_rates.dart';
+import 'package:provider/provider.dart';
 import '../services/database_service.dart';
 import '../models/transaction.dart' as model;
 import 'package:graphic/graphic.dart';
@@ -37,8 +39,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   List<Map<String, Color>> _categories = [];
   bool _isLoading = true;
   TimeRange _range = TimeRange.month;
-  double _usdRate = 42.0;
-  double _eurRate = 51.0;
 
   // methods for the current view
   DateTime _selectedDate = DateTime.now();
@@ -69,26 +69,23 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     setState(() {});
   }
 
-  String _getTotal(currency) {
+  String _getTotal() {
     double total = 0;
     for (final tx in _income) {
       if (_range == TimeRange.month) {
         if (tx.date.year == _selectedDate.year &&
             tx.date.month == _selectedDate.month) {
-          currency == 'UAH' ? total += _toUAH(tx) : total += tx.amount_usd;
+          total += tx.amount_usd;
         }
       } else {
-        if (tx.date.year == _selectedDate.year) {
-          // total += _toUAH(tx);
-          currency == 'UAH' ? total += _toUAH(tx) : total += tx.amount_usd;
-        }
+        if (tx.date.year == _selectedDate.year) total += tx.amount_usd;
       }
     }
 
-    var formatter = NumberFormat('#,##,000');
+    var formatter = NumberFormat('###,###');
     String numberTotal = formatter.format(total).trim().replaceAll(',', ' ');
     return '$numberTotal '
-        '$currency';
+        r'$';
   }
 
   @override
@@ -98,6 +95,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   }
 
   Future<void> _loadData() async {
+    final rates = Provider.of<ExchangeRates>(context, listen: false);
+    var _usdRate = rates.usd;
+    var _eurRate = rates.eur;
     setState(() => _isLoading = true);
     try {
       final tx = await _db.getTransactions('income');
@@ -131,10 +131,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     setState(() {
       _range = r;
     });
-  }
-
-  double _toUAH(model.Transaction tx) {
-    return tx.amount;
   }
 
   // Returns list of (type, date, value, value) pairs ordered by time
@@ -172,7 +168,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         if (map.containsKey(key)) {
           map[key] = IncomeEntry(
             date: map[key]!.date,
-            amount: map[key]!.amount + _toUAH(tx),
+            amount: map[key]!.amount + tx.amount_usd,
             category: map[key]!.category,
             color: Colors.white,
           );
@@ -201,7 +197,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           if (map.containsKey(key)) {
             map[key] = IncomeEntry(
               date: map[key]!.date,
-              amount: map[key]!.amount + _toUAH(tx),
+              amount: map[key]!.amount + tx.amount_usd,
               category: map[key]!.category,
               color: Colors.white,
             );
@@ -229,6 +225,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final rates = Provider.of<ExchangeRates>(context, listen: false);
+    final usdRate = rates.usd;
+    final eurRate = rates.eur;
+
     final data = _aggregate().entries
         .map((e) => MapEntry(e.key, e.value.amount))
         .toList();
@@ -241,9 +241,52 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final theme = FTheme.of(context);
     final theme_colors = theme.colors;
 
-    final graphData = data.asMap().entries.map((entry) {
-      return {'type': 'Income', 'index': entry.key, 'value': entry.value.value};
-    }).toList();
+    // Build a map of source name -> Color from loaded categories
+    final sourceColors = <String, Color>{};
+    for (final m in _categories) {
+      if (m.isNotEmpty) {
+        final name = m.keys.first;
+        final color = m.values.first;
+        sourceColors[name] = color;
+      }
+    }
+
+    // Build graphData as series per source (for stacked bars)
+    final labels = _aggregate().keys.toList();
+    final graphData = <Map<String, Object>>[];
+
+    if (sourceColors.isNotEmpty) {
+      for (final source in sourceColors.keys) {
+        for (var i = 0; i < labels.length; i++) {
+          final label = labels[i];
+          // sum amount_usd for this source on this label (date/month/year)
+          double sum = 0;
+          for (final tx in _income) {
+            if ((tx.source ?? '') == source) {
+              // match by label format used in labels
+              final txLabel = _range == TimeRange.month
+                  ? DateFormat('yyyy-MM-dd').format(tx.date)
+                  : _range == TimeRange.year
+                  ? DateFormat('yyyy-MM').format(tx.date)
+                  : tx.date.year.toString();
+              if (txLabel == label) sum += tx.amount_usd;
+            }
+          }
+          graphData.add({'type': source, 'index': i, 'value': sum});
+        }
+      }
+    } else {
+      // fallback: single series with totals
+      graphData.addAll(
+        data.asMap().entries.map((entry) {
+          return {
+            'type': 'Income',
+            'index': entry.key,
+            'value': entry.value.value,
+          };
+        }),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -310,7 +353,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   ),
 
                   Text(
-                    '${l10n.total_income}: ${_getTotal('UAH')} (${_getTotal('USD')})',
+                    '${l10n.total_income}: ${_getTotal()}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

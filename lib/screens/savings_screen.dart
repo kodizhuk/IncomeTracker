@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_money/services/exchange_rates.dart';
@@ -8,13 +6,7 @@ import '../models/savings_account.dart';
 import '../services/database_service.dart';
 import 'add_savings_screen.dart';
 import '../widgets/savings_account_widget.dart';
-import 'settings_screen.dart';
-import 'statistics_screen.dart';
 import '../l10n/app_localizations.dart';
-
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class SavingsScreen extends StatefulWidget {
   final ValueNotifier<int>? navIndexNotifier;
@@ -30,7 +22,6 @@ class _SavingsScreenState extends State<SavingsScreen> {
 
   bool _isLoading = true;
   String _selectedCurrency = 'All';
-  String _ratesText = 'Loading...';
 
   @override
   void initState() {
@@ -186,31 +177,6 @@ class _SavingsScreenState extends State<SavingsScreen> {
       }
       return sum;
     });
-  }
-
-  Future<void> _loadRates() async {
-    final response = await http.get(
-      Uri.parse(
-        'https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=5',
-      ),
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-
-      final usd = data.firstWhere((item) => item['ccy'] == 'USD');
-      final eur = data.firstWhere((item) => item['ccy'] == 'EUR');
-      final usdSale = double.parse(usd['sale']).toStringAsFixed(2);
-      final eurSale = double.parse(eur['sale']).toStringAsFixed(2);
-
-      setState(() {
-        _ratesText = 'USD: $usdSale \nEUR: $eurSale';
-      });
-    } else {
-      setState(() {
-        _ratesText = 'Failed to load rates';
-      });
-    }
   }
 
   @override
