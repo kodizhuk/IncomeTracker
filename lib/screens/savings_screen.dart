@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_money/services/exchange_rates.dart';
+import 'package:provider/provider.dart';
 import '../models/savings_account.dart';
 import '../services/database_service.dart';
 import 'add_savings_screen.dart';
@@ -29,14 +31,12 @@ class _SavingsScreenState extends State<SavingsScreen> {
   bool _isLoading = true;
   String _selectedCurrency = 'All';
   String _ratesText = 'Loading...';
-  double _settingsUsdRate = 42.0;
-  double _settingsEurRate = 51.0;
 
   @override
   void initState() {
     super.initState();
     _loadSavingsAccounts();
-    _loadRates();
+    // _loadRates();
     widget.navIndexNotifier?.addListener(_onNavIndexChanged);
   }
 
@@ -71,8 +71,6 @@ class _SavingsScreenState extends State<SavingsScreen> {
           }
         }
 
-        _settingsUsdRate = rates['usd'] ?? _settingsUsdRate;
-        _settingsEurRate = rates['eur'] ?? _settingsEurRate;
         _isLoading = false;
       });
     } catch (e) {
@@ -155,12 +153,16 @@ class _SavingsScreenState extends State<SavingsScreen> {
   }
 
   double get _totalSavings {
+    final rates = Provider.of<ExchangeRates>(context, listen: false);
+    final usdRate = rates.usd;
+    final eurRate = rates.eur;
+
     // Calculate total depends on the selected currency
     return _savingsAccounts.fold(0.0, (sum, account) {
       if (_selectedCurrency == 'UAH') {
         //count all the account money of the selected currency
         if (account.currency == 'UAH') {
-          sum += account.amount;
+          sum += (account.amount / usdRate);
           //print('curr $amount ${account.currency}');
         }
       } else if (_selectedCurrency == 'USD') {
@@ -173,11 +175,15 @@ class _SavingsScreenState extends State<SavingsScreen> {
           sum += account.amount;
         }
       } else {
-        // count total
-        sum += account.amount;
-        //print('curr $amount ${account.currency}');
+        // count total for all currencies, converting to UAH using the rates
+        if (account.currency == 'USD') {
+          sum += account.amount;
+        } else if (account.currency == 'EUR') {
+          sum += account.amount * eurRate / usdRate;
+        } else if (account.currency == 'UAH') {
+          sum += account.amount / usdRate;
+        }
       }
-
       return sum;
     });
   }
@@ -210,6 +216,10 @@ class _SavingsScreenState extends State<SavingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final rates = Provider.of<ExchangeRates>(context, listen: false);
+    final usdRate = rates.usd;
+    final eurRate = rates.eur;
+
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.all(8),
@@ -262,7 +272,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
                     padding: const EdgeInsets.all(8),
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      _ratesText,
+                      "$usdRate UAH/USD, $eurRate UAH/EUR",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -343,7 +353,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
         currencySymbol = r'€';
         break;
       case 'UAH':
-        currencySymbol = r'₴';
+        currencySymbol = r'$';
         break;
       default:
         currencySymbol = r'$';

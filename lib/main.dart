@@ -3,13 +3,26 @@ import 'package:forui/forui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_money/screens/settings_screen.dart';
 import 'package:my_money/screens/statistics_screen.dart';
+import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
 
 import 'screens/transaction_screen.dart';
 import 'screens/savings_screen.dart';
+import 'services/exchange_rates.dart';
 
 void main() {
-  runApp(const Application());
+  // runApp(const Application());
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) {
+        final r = ExchangeRates();
+        r.load(); // start loading on app launch
+        return r;
+      },
+      child: const Application(),
+    ),
+  );
 }
 
 class Application extends StatelessWidget {
