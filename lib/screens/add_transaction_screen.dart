@@ -150,7 +150,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       },
                     ),
                   ),
+
                   const SizedBox(width: 12),
+
                   Expanded(
                     flex: 4,
                     child: FSelect<String>.rich(
@@ -176,7 +178,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   style: text.sm.copyWith(color: colors.primary),
                 ),
               ],
+
               const SizedBox(height: 16),
+
               Row(
                 children: [
                   Expanded(

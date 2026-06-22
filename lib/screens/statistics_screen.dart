@@ -12,6 +12,14 @@ import 'package:graphic/graphic.dart';
 //Buttons to select time range for graphs
 enum TimeRange { month, year }
 
+class LegendItem {
+  final String label;
+  final Color color;
+  final double total;
+
+  LegendItem({required this.label, required this.color, required this.total});
+}
+
 class IncomeEntry {
   final DateTime date;
   final double amount; // Amount
@@ -39,9 +47,48 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   List<Map<String, Color>> _categories = [];
   bool _isLoading = true;
   TimeRange _range = TimeRange.month;
+  // chart state
+  List<Map<String, Object>> _graphData = [];
+  List<Map<String, Object>> _pieData = [];
+  double _maxYState = 1;
 
   // methods for the current view
   DateTime _selectedDate = DateTime.now();
+
+  final FSelectController<String> _sourceController =
+      FSelectController<String>();
+  List<String> _sources = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+    _loadSources();
+  }
+
+  Future<void> _loadSources() async {
+    try {
+      // final l10n = AppLocalizations.of(context)!;
+      final incomeList = await DatabaseService().getSources('income');
+      final expencesList = await DatabaseService().getSources('expense');
+
+      final names = [
+        'All',
+        ...incomeList.map((r) => 'Income: ${r['name'].toString()}'),
+        ...expencesList.map((r) => 'Expense: ${r['name'].toString()}'),
+      ];
+
+      setState(() {
+        _sources = names.isNotEmpty ? names : ['Other'];
+        _sourceController.value = _sources.isNotEmpty ? _sources.first : null;
+      });
+    } catch (e) {
+      setState(() {
+        _sources = ['Other'];
+      });
+    }
+  }
+
   String _getDate() {
     final locale = Localizations.localeOf(context).toLanguageTag();
     if (_range == TimeRange.month) {
@@ -49,24 +96,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     } else {
       return DateFormat('yyyy', locale).format(_selectedDate);
     }
-  }
-
-  void _nextDate() {
-    if (_range == TimeRange.month) {
-      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month + 1);
-    } else if (_range == TimeRange.year) {
-      _selectedDate = DateTime(_selectedDate.year + 1, _selectedDate.month);
-    }
-    setState(() {});
-  }
-
-  void _previousDate() {
-    if (_range == TimeRange.month) {
-      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month - 1);
-    } else if (_range == TimeRange.year) {
-      _selectedDate = DateTime(_selectedDate.year - 1, _selectedDate.month);
-    }
-    setState(() {});
   }
 
   String _getTotal() {
@@ -88,10 +117,26 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         r'$';
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
+  void _nextDate() {
+    if (_range == TimeRange.month) {
+      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month + 1);
+    } else if (_range == TimeRange.year) {
+      _selectedDate = DateTime(_selectedDate.year + 1, _selectedDate.month);
+    }
+    setState(() {
+      _recomputeCharts();
+    });
+  }
+
+  void _previousDate() {
+    if (_range == TimeRange.month) {
+      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month - 1);
+    } else if (_range == TimeRange.year) {
+      _selectedDate = DateTime(_selectedDate.year - 1, _selectedDate.month);
+    }
+    setState(() {
+      _recomputeCharts();
+    });
   }
 
   Future<void> _loadData() async {
@@ -118,6 +163,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         _eurRate = rates['eur'] ?? _eurRate;
         _isLoading = false;
       });
+      _recomputeCharts();
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(
@@ -126,10 +172,87 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     }
   }
 
+  void _recomputeCharts() {
+    // build source color map
+    _maxYState = 1;
+    final list = <String, Color>{};
+    for (final m in _categories) {
+      if (m.isNotEmpty) {
+        final name = m.keys.first;
+        final color = m.values.first;
+        list[name] = color;
+      }
+    }
+
+    // labels for current range
+    final labels = _aggregate().keys.toList();
+
+    final graphData = <Map<String, Object>>[];
+    if (list.isNotEmpty) {
+      for (final source in list.keys) {
+        for (var i = 0; i < labels.length; i++) {
+          final label = labels[i];
+          double sum = 0;
+          for (final tx in _income) {
+            if ((tx.source ?? '') == source) {
+              final txLabel = _range == TimeRange.month
+                  ? DateFormat('yyyy-MM-dd').format(tx.date)
+                  : _range == TimeRange.year
+                  ? DateFormat('yyyy-MM').format(tx.date)
+                  : tx.date.year.toString();
+              if (txLabel == label) sum += tx.amount_usd;
+            }
+          }
+          // if (sum > _maxYState) _maxYState = sum;
+          graphData.add({'type': source, 'index': i, 'value': sum});
+        }
+      }
+    } else {
+      final data = _aggregate().entries
+          .map((e) => MapEntry(e.key, e.value.amount))
+          .toList();
+      graphData.addAll(
+        data.asMap().entries.map((entry) {
+          return {
+            'type': 'Income',
+            'index': entry.key,
+            'value': entry.value.value,
+          };
+        }),
+      );
+    }
+
+    final Map<String, double> pieMap = {};
+    for (final entry in graphData) {
+      final t = entry['type'] as String;
+      final v = (entry['value'] as num).toDouble();
+      if (v == 0) continue;
+      pieMap[t] = (pieMap[t] ?? 0) + v;
+    }
+
+    final pieData = pieMap.entries
+        .map((e) => {'type': e.key, 'value': e.value})
+        .toList();
+
+    final dataVals = graphData
+        .map((e) => (e['value'] as num).toDouble())
+        .toList();
+    double maxY = dataVals.isEmpty
+        ? 1
+        : dataVals.reduce((a, b) => a > b ? a : b);
+
+    setState(() {
+      _graphData = graphData;
+      _pieData = pieData;
+      _maxYState = maxY;
+    });
+  }
+
   // Set the time range for graphs and refresh the data
   void _setRange(TimeRange r) {
     setState(() {
       _range = r;
+      _recomputeCharts();
     });
   }
 
@@ -229,64 +352,31 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final usdRate = rates.usd;
     final eurRate = rates.eur;
 
-    final data = _aggregate().entries
-        .map((e) => MapEntry(e.key, e.value.amount))
-        .toList();
-
-    double maxY = data.isEmpty
-        ? 0
-        : data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+    // use precomputed chart state
+    final graphData = _graphData;
+    final pieData = _pieData;
 
     final l10n = AppLocalizations.of(context)!;
     final theme = FTheme.of(context);
     final theme_colors = theme.colors;
 
-    // Build a map of source name -> Color from loaded categories
-    final sourceColors = <String, Color>{};
-    for (final m in _categories) {
-      if (m.isNotEmpty) {
-        final name = m.keys.first;
-        final color = m.values.first;
-        sourceColors[name] = color;
-      }
-    }
+    // Build legend items from pieData
+    // final legendItems = pieData.map((e) {
+    final legendItems = pieData.asMap().entries.map((entry) {
+      final index = entry.key;
+      final e = entry.value;
 
-    // Build graphData as series per source (for stacked bars)
-    final labels = _aggregate().keys.toList();
-    final graphData = <Map<String, Object>>[];
+      final label = e['type'] as String;
+      final total = (e['value'] as num).toDouble();
+      final color = Defaults.colors10[index];
+      return LegendItem(label: label, color: color, total: total);
+    }).toList();
 
-    if (sourceColors.isNotEmpty) {
-      for (final source in sourceColors.keys) {
-        for (var i = 0; i < labels.length; i++) {
-          final label = labels[i];
-          // sum amount_usd for this source on this label (date/month/year)
-          double sum = 0;
-          for (final tx in _income) {
-            if ((tx.source ?? '') == source) {
-              // match by label format used in labels
-              final txLabel = _range == TimeRange.month
-                  ? DateFormat('yyyy-MM-dd').format(tx.date)
-                  : _range == TimeRange.year
-                  ? DateFormat('yyyy-MM').format(tx.date)
-                  : tx.date.year.toString();
-              if (txLabel == label) sum += tx.amount_usd;
-            }
-          }
-          graphData.add({'type': source, 'index': i, 'value': sum});
-        }
-      }
-    } else {
-      // fallback: single series with totals
-      graphData.addAll(
-        data.asMap().entries.map((entry) {
-          return {
-            'type': 'Income',
-            'index': entry.key,
-            'value': entry.value.value,
-          };
-        }),
-      );
-    }
+    final colorByType = {
+      for (final item in legendItems) item.label: item.color,
+    };
+
+    // graphData/pieData/maxY are provided from state (recomputed)
 
     return Scaffold(
       appBar: AppBar(
@@ -297,8 +387,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       ),
       // TODO: add total Tithes calculation
       // TODO: filter by category
-      // TODO: add graph/pie chart for income categories
-      //
+
       //Buttons
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -320,6 +409,16 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         label: Text(l10n.year),
                         selected: _range == TimeRange.year,
                         onSelected: (_) => _setRange(TimeRange.year),
+                      ),
+                      Expanded(
+                        child: FSelect<String>.rich(
+                          control: .managed(controller: _sourceController),
+                          format: (s) => s,
+                          children: [
+                            for (final source in _sources)
+                              .item(title: Text(source), value: source),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -360,56 +459,149 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     ),
                   ),
 
+                  SizedBox(height: 16),
+
+                  // Legend
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: legendItems.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 12,
+                              height: 12,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: item.color,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            Text(
+                              '${item.label}: ${item.total} \$',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
                   Container(
                     margin: const EdgeInsets.only(top: 10),
                     width: 350,
                     height: 300,
-                    child: Chart(
-                      data: graphData,
-                      variables: {
-                        'index': Variable(
-                          accessor: (Map map) => map['index'].toString(),
-                        ),
-                        'type': Variable(
-                          accessor: (Map map) => map['type'] as String,
-                        ),
-                        'value': Variable(
-                          accessor: (Map map) => (map['value'] as num).toInt(),
-                          scale: LinearScale(min: 0, max: maxY * 1.2),
-                        ),
-                      },
-                      marks: [
-                        IntervalMark(
-                          position:
-                              Varset('index') *
-                              Varset('value') /
-                              Varset('type'),
-                          shape: ShapeEncode(
-                            value: RectShape(labelPosition: 1),
-                          ),
-                          color: ColorEncode(
-                            variable: 'type',
-                            values: Defaults.colors10,
-                          ),
-                          label: LabelEncode(
-                            encoder: (tuple) => Label(
-                              tuple['value'].toString(),
-                              LabelStyle(
-                                textStyle: const TextStyle(fontSize: 10),
+                    child:
+                        (graphData.isEmpty ||
+                            !graphData.any((e) => (e['value'] as num) > 0))
+                        ? const Center(child: Text('No data'))
+                        : Chart(
+                            key: ValueKey(
+                              graphData
+                                  .map(
+                                    (e) =>
+                                        '${e['type']}:${e['index']}:${e['value']}',
+                                  )
+                                  .join('|'),
+                            ),
+                            data: graphData,
+                            variables: {
+                              'index': Variable(
+                                accessor: (Map map) => map['index'].toString(),
                               ),
+                              'type': Variable(
+                                accessor: (Map map) => map['type'] as String,
+                              ),
+                              'value': Variable(
+                                accessor: (Map map) =>
+                                    (map['value'] as num).toInt(),
+                                scale: LinearScale(min: 0, max: _maxYState * 2),
+                              ),
+                            },
+                            marks: [
+                              IntervalMark(
+                                position:
+                                    Varset('index') *
+                                    Varset('value') /
+                                    Varset('type'),
+                                shape: ShapeEncode(
+                                  value: RectShape(labelPosition: 1),
+                                ),
+                                color: ColorEncode(
+                                  encoder: (tuple) =>
+                                      colorByType[tuple['type']] ?? Colors.grey,
+                                ),
+                                label: LabelEncode(
+                                  encoder: (tuple) => Label(
+                                    tuple['value'].toString(),
+                                    LabelStyle(
+                                      textStyle: const TextStyle(fontSize: 10),
+                                    ),
+                                  ),
+                                ),
+                                modifiers: [StackModifier()],
+                              ),
+                            ],
+                            axes: [
+                              Defaults.horizontalAxis,
+                              Defaults.verticalAxis,
+                            ],
+                            // selections: {
+                            //   'tap': PointSelection(variable: 'value'),
+                            // },
+                            // tooltip: TooltipGuide(multiTuples: true),
+                            // crosshair: CrosshairGuide(),
+                          ),
+                  ),
+
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    width: 350,
+                    height: 300,
+                    child: (pieData.isEmpty)
+                        ? const Center(child: Text('No data'))
+                        : Chart(
+                            key: ValueKey(
+                              pieData
+                                  .map((e) => '${e['type']}:${e['value']}')
+                                  .join('|'),
+                            ),
+                            data: pieData,
+                            variables: {
+                              'type': Variable(
+                                accessor: (Map map) => map['type'] as String,
+                              ),
+                              'value': Variable(
+                                accessor: (Map map) => map['value'] as num,
+                              ),
+                            },
+                            transforms: [
+                              Proportion(variable: 'value', as: 'percent'),
+                            ],
+                            marks: [
+                              IntervalMark(
+                                position: Varset('percent') / Varset('type'),
+                                label: LabelEncode(
+                                  encoder: (tuple) =>
+                                      Label(tuple['value'].toString()),
+                                ),
+                                color: ColorEncode(
+                                  encoder: (tuple) =>
+                                      colorByType[tuple['type']] ?? Colors.grey,
+                                ),
+                                modifiers: [StackModifier()],
+                              ),
+                            ],
+                            coord: PolarCoord(
+                              transposed: true,
+                              dimCount: 1,
+                              dimFill: 1.05,
                             ),
                           ),
-                          modifiers: [StackModifier()],
-                        ),
-                      ],
-                      coord: RectCoord(
-                        horizontalRangeUpdater: Defaults.horizontalRangeEvent,
-                      ),
-                      axes: [Defaults.horizontalAxis, Defaults.verticalAxis],
-                      selections: {'tap': PointSelection(variable: 'index')},
-                      tooltip: TooltipGuide(multiTuples: true),
-                      // crosshair: CrosshairGuide(),
-                    ),
                   ),
                 ],
               ),
