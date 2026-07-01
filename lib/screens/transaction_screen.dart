@@ -108,8 +108,8 @@ class _InOutScreenState extends State<InOutScreen> {
 
   Future<void> _loadTransactions() async {
     final rates = Provider.of<ExchangeRates>(context, listen: false);
-    double _usdRate = rates.usd;
-    double _eurRate = rates.eur;
+    double usdRate = rates.usd;
+    double eurRate = rates.eur;
     setState(() => _isLoading = true);
     try {
       final transactions = await _dbService.getTransactions('income');
@@ -127,8 +127,8 @@ class _InOutScreenState extends State<InOutScreen> {
         }
         _allIncomeTransactions = transactions;
         _expenseTransactions = expenses;
-        _usdRate = rates['usd'] ?? _usdRate;
-        _eurRate = rates['eur'] ?? _eurRate;
+        usdRate = rates['usd'] ?? usdRate;
+        eurRate = rates['eur'] ?? eurRate;
         _isLoading = false;
       });
     } catch (e) {

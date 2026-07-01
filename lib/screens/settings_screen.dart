@@ -122,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, style, animation) => FTheme(
         data: theme,
         child: FDialog(
-          style: style,
+          style: style.call,
           animation: animation,
           direction: .horizontal,
           title: Text(l10n.what_new),
@@ -150,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, style, animation) => FTheme(
         data: theme,
         child: FDialog(
-          style: style,
+          style: style.call,
           animation: animation,
           direction: .horizontal,
           title: const Text('Money Tracker'),

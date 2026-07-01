@@ -52,12 +52,16 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   List<Map<String, Object>> _pieData = [];
   double _maxYState = 1;
 
-  // methods for the current view
   DateTime _selectedDate = DateTime.now();
 
-  final FSelectController<String> _sourceController =
+  //List of sources for the dropdown
+  final FSelectController<String> _sourcesController =
       FSelectController<String>();
-  List<String> _sources = [];
+  List<String> _sourcesList = ['Income', 'Expense'];
+  //List of categories for the dropdown
+  final FSelectController<String> _categoriesController =
+      FSelectController<String>();
+  List <String> _categoriesList = [];
 
   @override
   void initState() {
@@ -72,19 +76,29 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       final incomeList = await DatabaseService().getSources('income');
       final expencesList = await DatabaseService().getSources('expense');
 
-      final names = [
-        'All',
-        ...incomeList.map((r) => 'Income: ${r['name'].toString()}'),
-        ...expencesList.map((r) => 'Expense: ${r['name'].toString()}'),
-      ];
+      //initl the dropdown with the first source
+      _sourcesController.value = _sourcesList.first;
+      if (incomeList.isNotEmpty) {
+        _categoriesList = incomeList.map((r) => r['name'].toString()).toList();
+        _categoriesController.value = incomeList.first['name'] as String;
+      } else{
+        _categoriesController.value = 'None';
+      }
 
-      setState(() {
-        _sources = names.isNotEmpty ? names : ['Other'];
-        _sourceController.value = _sources.isNotEmpty ? _sources.first : null;
+      _sourcesController.addListener(() {
+        // update _categoriesList whenever the _sourcesController changes
+        setState(() {
+          if (_sourcesController.value == 'Income'){
+            _categoriesList = incomeList.map((r) => r['name'].toString()).toList();
+            _categoriesController.value = incomeList.isNotEmpty ? incomeList.first['name'] as String : 'None';
+          } else if (_sourcesController.value == 'Expense'){
+            _categoriesList = expencesList.map((r) => r['name'].toString()).toList();
+            _categoriesController.value = expencesList.isNotEmpty ? expencesList.first['name'] as String : 'None';
+          }
+        });
       });
     } catch (e) {
       setState(() {
-        _sources = ['Other'];
       });
     }
   }
@@ -141,8 +155,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   Future<void> _loadData() async {
     final rates = Provider.of<ExchangeRates>(context, listen: false);
-    var _usdRate = rates.usd;
-    var _eurRate = rates.eur;
+    var usdRate = rates.usd;
+    var eurRate = rates.eur;
     setState(() => _isLoading = true);
     try {
       final tx = await _db.getTransactions('income');
@@ -159,8 +173,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               },
             )
             .toList();
-        _usdRate = rates['usd'] ?? _usdRate;
-        _eurRate = rates['eur'] ?? _eurRate;
+        usdRate = rates['usd'] ?? usdRate;
+        eurRate = rates['eur'] ?? eurRate;
         _isLoading = false;
       });
       _recomputeCharts();
@@ -358,7 +372,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
     final l10n = AppLocalizations.of(context)!;
     final theme = FTheme.of(context);
-    final theme_colors = theme.colors;
+    final themeColors = theme.colors;
 
     // Build legend items from pieData
     // final legendItems = pieData.map((e) {
@@ -412,11 +426,21 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                       Expanded(
                         child: FSelect<String>.rich(
-                          control: .managed(controller: _sourceController),
+                          control: .managed(controller: _sourcesController),
                           format: (s) => s,
                           children: [
-                            for (final source in _sources)
+                            for (final source in _sourcesList)
                               .item(title: Text(source), value: source),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: FSelect<String>.rich(
+                          control: .managed(controller: _categoriesController),
+                          format: (s) => s,
+                          children: [
+                            for (final category in _categoriesList)
+                              .item(title: Text(category), value: category),
                           ],
                         ),
                       ),

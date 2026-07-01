@@ -105,7 +105,7 @@ class _EditCategoriesScreenState extends State<EditCategoriesScreen> {
                       ? const Center(child: Text('No categories yet'))
                       : ListView.separated(
                           itemCount: _categories.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final s = _categories[index];
                             return ListTile(

@@ -95,7 +95,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final isEditing = widget.existingTransaction != null;
     final l10n = AppLocalizations.of(context)!;
 
-    var page_header = Text(
+    var pageHeader = Text(
       isEditing
           ? widget.type == 'income'
                 ? l10n.edit_income
@@ -115,7 +115,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
     return FScaffold(
       header: FHeader.nested(
-        title: page_header,
+        title: pageHeader,
         prefixes: [FHeaderAction.back(onPress: () => Navigator.pop(context))],
       ),
       child: Padding(

@@ -51,7 +51,7 @@ class _EditSourcesScreenState extends State<EditSourcesScreen> {
                           );
 
       
-      await _db.insertSource('income', name, randomColor.value.toRadixString(16));
+      await _db.insertSource('income', name, randomColor.toARGB32().toRadixString(16));
       _newSourceController.clear();
       _loadSources();
     } catch (e) {
@@ -118,7 +118,7 @@ class _EditSourcesScreenState extends State<EditSourcesScreen> {
                       ? const Center(child: Text('No sources yet'))
                       : ListView.separated(
                           itemCount: _sources.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final s = _sources[index];
                             return ListTile(

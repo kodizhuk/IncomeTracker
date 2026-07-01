@@ -17,12 +17,10 @@ class ExchangeRates extends ChangeNotifier {
     try {
       // Read persisted rates (database may use 'usd' or 'usd_rate')
       final persisted = await _db.getExchangeRates();
-      if (persisted != null) {
-        if (persisted.containsKey('usd')) {
-          usd = (persisted['usd'] as num).toDouble();
-        } else if (persisted.containsKey('usd_rate')) {
-          usd = (persisted['usd_rate'] as num).toDouble();
-        }
+      if (persisted.containsKey('usd')) {
+        usd = (persisted['usd'] as num).toDouble();
+      } else if (persisted.containsKey('usd_rate')) {
+        usd = (persisted['usd_rate'] as num).toDouble();
       }
 
       // Try fetching latest rates from PrivatBank
