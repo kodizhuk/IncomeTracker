@@ -1,6 +1,8 @@
 // pie_card.dart
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
+import 'package:flutter/widget_previews.dart';
+
 
 class PieCard extends StatelessWidget {
   final List<Map<String, dynamic>> pieData;
@@ -57,4 +59,18 @@ class PieCard extends StatelessWidget {
             ),
     );
   }
+}
+
+@Preview(name: 'PieChart')
+Widget pieCardPreview() {
+  return PieCard(
+    pieData: const [
+      {'type': 'Company1', 'index': 0, 'value': 120},
+      {'type': 'Company2', 'index': 1, 'value': 14},
+    ],
+    colorByType: const {
+      'Company1': Colors.blue,
+      'Company2': Colors.orange,
+    },
+  );
 }

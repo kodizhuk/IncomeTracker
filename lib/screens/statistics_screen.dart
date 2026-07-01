@@ -76,6 +76,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       // final l10n = AppLocalizations.of(context)!;
       final incomeList = await DatabaseService().getSources('income');
       final expencesList = await DatabaseService().getSources('expense');
+      final list = ['All', ...incomeList];
 
       //initl the dropdown with the first source
       _sourcesController.value = _sourcesList.first;

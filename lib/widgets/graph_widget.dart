@@ -1,6 +1,7 @@
 // graph_card.dart
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
+import 'package:flutter/widget_previews.dart';
 
 class GraphCard extends StatelessWidget {
   final List<Map<String, dynamic>> graphData;
@@ -16,6 +17,13 @@ class GraphCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //find the max value for to scale the Graph
+    final maxValue = graphData
+        .map((e) => e['value'] as num)
+        .fold<num>(0, (prev, v) => v > prev ? v : prev)
+        .toDouble();
+    final scaleMax = maxValue ;
+
     return Container(
       margin: const EdgeInsets.only(top: 10),
       height: 300,
@@ -39,7 +47,7 @@ class GraphCard extends StatelessWidget {
                 ),
                 'value': Variable(
                   accessor: (Map map) => (map['value'] as num).toInt(),
-                  scale: LinearScale(min: 0, max: maxYState * 2),
+                  scale: LinearScale(min: 0, max: scaleMax),
                 ),
               },
               marks: [
@@ -50,20 +58,48 @@ class GraphCard extends StatelessWidget {
                     encoder: (tuple) =>
                         colorByType[tuple['type']] ?? Colors.grey,
                   ),
-                  label: LabelEncode(
-                    encoder: (tuple) => Label(
-                      tuple['value'].toString(),
-                      LabelStyle(textStyle: const TextStyle(fontSize: 10)),
-                    ),
-                  ),
+                  // label: LabelEncode(
+                  //   encoder: (tuple) => Label(
+                  //     tuple['value'].toString(),
+                  //     LabelStyle(textStyle: const TextStyle(fontSize: 10)),
+                  //   ),
+                  // ),
                   modifiers: [StackModifier()],
                 ),
               ],
               axes: [
                 Defaults.horizontalAxis,
-                Defaults.verticalAxis,
+                AxisGuide(
+                  tickLine: TickLine(length: 5),
+                  grid: PaintStyle(
+                    strokeColor: const Color.fromARGB(31, 255, 255, 255),
+                    strokeWidth: 2,
+                  ),// grid color
+
+                ),
               ],
             ),
     );
   }
+}
+
+@Preview(name: 'GraphCard')
+Widget graphCardPreview() {
+  return GraphCard(
+    graphData: const [
+      {'type': 'A', 'index': 0, 'value': 10},
+      {'type': 'A', 'index': 1, 'value': 14},
+      {'type': 'B', 'index': 0, 'value': 7},
+      {'type': 'B', 'index': 1, 'value': 18},
+      {'type': 'C', 'index': 3, 'value': 0},
+      {'type': 'D', 'index': 4, 'value': 0},
+      {'type': 'E', 'index': 5, 'value': 0},
+      {'type': 'F', 'index': 6, 'value': 0},
+    ],
+    colorByType: const {
+      'A': Colors.blue,
+      'B': Colors.orange,
+    },
+    maxYState: 30,
+  );
 }
