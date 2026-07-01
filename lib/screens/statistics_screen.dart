@@ -515,117 +515,126 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     }).toList(),
                   ),
 
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    width: 350,
-                    height: 300,
-                    child:
-                        (graphData.isEmpty ||
-                            !graphData.any((e) => (e['value'] as num) > 0))
-                        ? const Center(child: Text('No data'))
-                        : Chart(
-                            key: ValueKey(
-                              graphData
-                                  .map(
-                                    (e) =>
-                                        '${e['type']}:${e['index']}:${e['value']}',
-                                  )
-                                  .join('|'),
-                            ),
-                            data: graphData,
-                            variables: {
-                              'index': Variable(
-                                accessor: (Map map) => map['index'].toString(),
-                              ),
-                              'type': Variable(
-                                accessor: (Map map) => map['type'] as String,
-                              ),
-                              'value': Variable(
-                                accessor: (Map map) =>
-                                    (map['value'] as num).toInt(),
-                                scale: LinearScale(min: 0, max: _maxYState * 2),
-                              ),
-                            },
-                            marks: [
-                              IntervalMark(
-                                position:
-                                    Varset('index') *
-                                    Varset('value') /
-                                    Varset('type'),
-                                shape: ShapeEncode(
-                                  value: RectShape(labelPosition: 1),
-                                ),
-                                color: ColorEncode(
-                                  encoder: (tuple) =>
-                                      colorByType[tuple['type']] ?? Colors.grey,
-                                ),
-                                label: LabelEncode(
-                                  encoder: (tuple) => Label(
-                                    tuple['value'].toString(),
-                                    LabelStyle(
-                                      textStyle: const TextStyle(fontSize: 10),
+                  // Graphs
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children:  [
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            width: 350,
+                            height: 300,
+                            child:
+                                (graphData.isEmpty ||
+                                    !graphData.any((e) => (e['value'] as num) > 0))
+                                ? const Center(child: Text('No data'))
+                                : Chart(
+                                    key: ValueKey(
+                                      graphData
+                                          .map(
+                                            (e) =>
+                                                '${e['type']}:${e['index']}:${e['value']}',
+                                          )
+                                          .join('|'),
+                                    ),
+                                    data: graphData,
+                                    variables: {
+                                      'index': Variable(
+                                        accessor: (Map map) => map['index'].toString(),
+                                      ),
+                                      'type': Variable(
+                                        accessor: (Map map) => map['type'] as String,
+                                      ),
+                                      'value': Variable(
+                                        accessor: (Map map) =>
+                                            (map['value'] as num).toInt(),
+                                        scale: LinearScale(min: 0, max: _maxYState * 2),
+                                      ),
+                                    },
+                                    marks: [
+                                      IntervalMark(
+                                        position:
+                                            Varset('index') *
+                                            Varset('value') /
+                                            Varset('type'),
+                                        shape: ShapeEncode(
+                                          value: RectShape(labelPosition: 1),
+                                        ),
+                                        color: ColorEncode(
+                                          encoder: (tuple) =>
+                                              colorByType[tuple['type']] ?? Colors.grey,
+                                        ),
+                                        label: LabelEncode(
+                                          encoder: (tuple) => Label(
+                                            tuple['value'].toString(),
+                                            LabelStyle(
+                                              textStyle: const TextStyle(fontSize: 10),
+                                            ),
+                                          ),
+                                        ),
+                                        modifiers: [StackModifier()],
+                                      ),
+                                    ],
+                                    axes: [
+                                      Defaults.horizontalAxis,
+                                      Defaults.verticalAxis,
+                                    ],
+                                    // selections: {
+                                    //   'tap': PointSelection(variable: 'value'),
+                                    // },
+                                    // tooltip: TooltipGuide(multiTuples: true),
+                                    // crosshair: CrosshairGuide(),
+                                  ),
+                          ),
+
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            width: 350,
+                            height: 300,
+                            child: (pieData.isEmpty)
+                                ? const Center(child: Text('No data'))
+                                : Chart(
+                                    key: ValueKey(
+                                      pieData
+                                          .map((e) => '${e['type']}:${e['value']}')
+                                          .join('|'),
+                                    ),
+                                    data: pieData,
+                                    variables: {
+                                      'type': Variable(
+                                        accessor: (Map map) => map['type'] as String,
+                                      ),
+                                      'value': Variable(
+                                        accessor: (Map map) => map['value'] as num,
+                                      ),
+                                    },
+                                    transforms: [
+                                      Proportion(variable: 'value', as: 'percent'),
+                                    ],
+                                    marks: [
+                                      IntervalMark(
+                                        position: Varset('percent') / Varset('type'),
+                                        label: LabelEncode(
+                                          encoder: (tuple) =>
+                                              Label(tuple['value'].toString()),
+                                        ),
+                                        color: ColorEncode(
+                                          encoder: (tuple) =>
+                                              colorByType[tuple['type']] ?? Colors.grey,
+                                        ),
+                                        modifiers: [StackModifier()],
+                                      ),
+                                    ],
+                                    coord: PolarCoord(
+                                      transposed: true,
+                                      dimCount: 1,
+                                      dimFill: 1.05,
                                     ),
                                   ),
-                                ),
-                                modifiers: [StackModifier()],
-                              ),
-                            ],
-                            axes: [
-                              Defaults.horizontalAxis,
-                              Defaults.verticalAxis,
-                            ],
-                            // selections: {
-                            //   'tap': PointSelection(variable: 'value'),
-                            // },
-                            // tooltip: TooltipGuide(multiTuples: true),
-                            // crosshair: CrosshairGuide(),
                           ),
-                  ),
-
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    width: 350,
-                    height: 300,
-                    child: (pieData.isEmpty)
-                        ? const Center(child: Text('No data'))
-                        : Chart(
-                            key: ValueKey(
-                              pieData
-                                  .map((e) => '${e['type']}:${e['value']}')
-                                  .join('|'),
-                            ),
-                            data: pieData,
-                            variables: {
-                              'type': Variable(
-                                accessor: (Map map) => map['type'] as String,
-                              ),
-                              'value': Variable(
-                                accessor: (Map map) => map['value'] as num,
-                              ),
-                            },
-                            transforms: [
-                              Proportion(variable: 'value', as: 'percent'),
-                            ],
-                            marks: [
-                              IntervalMark(
-                                position: Varset('percent') / Varset('type'),
-                                label: LabelEncode(
-                                  encoder: (tuple) =>
-                                      Label(tuple['value'].toString()),
-                                ),
-                                color: ColorEncode(
-                                  encoder: (tuple) =>
-                                      colorByType[tuple['type']] ?? Colors.grey,
-                                ),
-                                modifiers: [StackModifier()],
-                              ),
-                            ],
-                            coord: PolarCoord(
-                              transposed: true,
-                              dimCount: 1,
-                              dimFill: 1.05,
-                            ),
-                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
