@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_money/screens/settings_screen.dart';
 import 'package:my_money/screens/statistics_screen.dart';
 import 'package:provider/provider.dart';
@@ -8,18 +7,28 @@ import 'l10n/app_localizations.dart';
 
 import 'screens/transaction_screen.dart';
 import 'screens/savings_screen.dart';
+import 'services/app_settings.dart';
 import 'services/exchange_rates.dart';
 
 void main() {
-  // runApp(const Application());
-
   runApp(
-    ChangeNotifierProvider(
-      create: (_) {
-        final r = ExchangeRates();
-        r.load(); // start loading on app launch
-        return r;
-      },
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) {
+            final settings = AppSettings();
+            settings.loadLocale();
+            return settings;
+          },
+        ),
+        ChangeNotifierProvider(
+          create: (_) {
+            final r = ExchangeRates();
+            r.load();
+            return r;
+          },
+        ),
+      ],
       child: const Application(),
     ),
   );
@@ -31,21 +40,14 @@ class Application extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = FThemes.blue.dark;
+    final settings = context.watch<AppSettings>();
 
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('uk'), // Set to Ukrainian
-      // localizationsDelegates: const [
-      //   FLocalizations.delegate, // Add this line
-      // ],
-      // supportedLocales: const [
-      //   Locale('en'), // English
-      //   Locale('uk'), // Ukranian
-      // ],
+      locale: settings.locale,
       theme: theme.toApproximateMaterialTheme(),
       builder: (_, child) => FAnimatedTheme(data: theme, child: child!),
-
       home: FScaffold(child: AppStates()),
     );
   }

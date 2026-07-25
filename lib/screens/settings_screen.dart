@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/app_settings.dart';
 import '../services/database_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
@@ -60,38 +62,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _editTheme() {}
   void _editLanguage() {
     final l10n = AppLocalizations.of(context)!;
-    final theme = FTheme.of(context);
+    final settings = context.read<AppSettings>();
+    final currentLanguage = settings.locale.languageCode == 'uk'
+        ? AppLanguage.ukrainian
+        : AppLanguage.english;
+    AppLanguage selectedLanguage = currentLanguage;
 
-    showFDialog(
+    showDialog<void>(
       context: context,
-      builder: (context, style, animation) => FTheme(
-        data: theme,
-        child: FDialog(
-          // style: style.copyWith(FButtonStyle.: 280, maxWidth: 420),
-          animation: animation,
-          direction: .horizontal,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
           title: Text(l10n.language),
-          body: FSelectGroup<AppLanguage>(
-            // controller: controller,
-            control: const .managedRadio(),
-            // label: const Text('Notifications'),
-            // description: const Text('Select the notifications.'),
-            validator: (values) =>
-                values?.isEmpty ?? true ? 'Please select a value.' : null,
-
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              .radio(value: AppLanguage.english, label: const Text('English')),
-              .radio(
+              RadioListTile<AppLanguage>(
+                title: const Text('English'),
+                value: AppLanguage.english,
+                groupValue: selectedLanguage,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedLanguage = value;
+                    });
+                  }
+                },
+              ),
+              RadioListTile<AppLanguage>(
+                title: const Text('Українська'),
                 value: AppLanguage.ukrainian,
-                label: const Text('Українська'),
+                groupValue: selectedLanguage,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedLanguage = value;
+                    });
+                  }
+                },
               ),
             ],
           ),
           actions: [
-            FButton(
-              // style: FButtonStyle.outline(),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final locale = selectedLanguage == AppLanguage.ukrainian
+                    ? const Locale('uk')
+                    : const Locale('en');
+                settings.setLocale(locale);
+                Navigator.of(dialogContext).pop();
+              },
               child: const Text('Ok'),
-              onPress: () => Navigator.of(context).pop(),
             ),
           ],
         ),
